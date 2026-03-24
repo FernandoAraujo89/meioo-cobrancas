@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
+import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
 interface NavItem {
   icon: React.ElementType;
@@ -100,11 +101,13 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
                       </span>
                       {child.meioo && (
                         <span
-                          className="inline-flex items-center justify-center rounded-[2px] bg-dark text-white font-black leading-none shrink-0"
-                          style={{ width: 12, height: 9, fontSize: 6 }}
+                          className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
+                          style={{ width: 12, height: 9 }}
                           title="Integrado com Meioo"
                         >
-                          o
+                          <svg viewBox={MEIOO_ICON_VB} width={9} height={7} fill="none" aria-hidden>
+                            <path d={MEIOO_ICON_PATH} fill="white" />
+                          </svg>
                         </span>
                       )}
                     </button>
@@ -125,10 +128,12 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
         >
           {/* Ícone retangular Meioo */}
           <div
-            className="flex items-center justify-center rounded-[3px] bg-dark group-hover:bg-primary transition-colors font-black text-white leading-none shrink-0"
-            style={{ width: 20, height: 14, fontSize: 9 }}
+            className="flex items-center justify-center rounded-[3px] bg-dark group-hover:bg-primary transition-colors shrink-0"
+            style={{ width: 20, height: 14 }}
           >
-            o
+            <svg viewBox={MEIOO_ICON_VB} width={15} height={11} fill="none" aria-hidden>
+              <path d={MEIOO_ICON_PATH} fill="white" />
+            </svg>
           </div>
           <div className="flex-1 text-left">
             <p className="text-xs font-semibold text-dark group-hover:text-primary transition-colors leading-tight">

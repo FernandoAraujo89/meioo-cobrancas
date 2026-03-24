@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Eye, EyeOff, QrCode, FileText, ExternalLink, Bell, ChevronRight, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
 // ─── Meioo Design Tokens (from styleguide vmGGJxD54dhMFVXMDQKM2S) ───────────
 const M = {
@@ -86,9 +87,10 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
                 width: 28, height: 20, borderRadius: 4,
                 background: M.primary,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 900, fontSize: 12, color: M.black, lineHeight: 1,
               }}>
-                o
+                <svg viewBox={MEIOO_ICON_VB} width={21} height={15} fill="none" aria-hidden>
+                  <path d={MEIOO_ICON_PATH} fill={M.black} />
+                </svg>
               </div>
               <span style={{ color: M.white, fontWeight: 700, fontSize: 14, letterSpacing: -0.3 }}>
                 Meioo
@@ -268,9 +270,10 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
             width: 18, height: 13, borderRadius: 3,
             background: M.primary,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 900, fontSize: 9, color: M.black, lineHeight: 1,
           }}>
-            o
+            <svg viewBox={MEIOO_ICON_VB} width={14} height={10} fill="none" aria-hidden>
+              <path d={MEIOO_ICON_PATH} fill={M.black} />
+            </svg>
           </div>
           <span style={{ color: M.dim, fontSize: 10 }}>
             Conta digital operada pela{" "}
