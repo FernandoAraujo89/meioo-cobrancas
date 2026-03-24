@@ -1,27 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Eye, EyeOff, QrCode, FileText, ExternalLink, Bell, ChevronRight, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import {
+  X,
+  Eye,
+  EyeOff,
+  QrCode,
+  CreditCard,
+  DollarSign,
+  MoreHorizontal,
+  Plus,
+  ChevronRight,
+  ArrowDownLeft,
+  ArrowUpRight,
+} from "lucide-react";
 import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
-// ─── Meioo Design Tokens (from styleguide vmGGJxD54dhMFVXMDQKM2S) ───────────
+/* ─── Meioo Design Tokens (from Figma vmGGJxD54dhMFVXMDQKM2S + style SVG) ── */
 const M = {
-  // Colors
-  bg:        "#181a1e",   // neutral-100 (darkest background)
-  black:     "#000000",   // neutral-200
-  surface:   "#0e0f12",   // slightly darker than bg for depth
-  card:      "#21252c",   // card surface, above bg
-  divider:   "#2d3339",   // Frame divider color
-  primary:   "#69fd7a",   // PRIMARY GREEN — brand color
-  white:     "#fefefe",   // text-100
-  offWhite:  "#e3e2e2",   // text-200
-  gray300:   "#cfcfcf",
-  gray600:   "#cccccc",
-  muted:     "#969696",   // neutral-1500
-  dim:       "#5f5f5f",   // neutral-2800
-  // Spacing scale: 4, 8, 12, 16, 20, 24, 32, 40, 48, 56
-  sp4:  4,  sp8:  8,  sp12: 12, sp16: 16,
-  sp20: 20, sp24: 24, sp32: 32,
+  // Dark section
+  black:      "#000000",
+  darkCard:   "#1D1F23",
+  dividerDk:  "#2d3339",
+  primary:    "#66FD7A",   // green from style SVG
+  primaryDim: "#69fd7a",
+  white:      "#fefefe",
+  offWhite:   "#e3e2e2",
+  muted:      "#969696",
+  dim:        "#5f5f5f",
+  // Light section (transactions)
+  lightBg:    "#ffffff",
+  lightText:  "#1a1a1a",
+  lightSub:   "#888888",
+  lightBorder:"#f0f0f0",
+  greenBadge: "#E2F7E4",
+  greenText:  "#1a8c2d",
+  redBadge:   "#FDE8E8",
+  redText:    "#c0392b",
+  grayBadge:  "#f0f0f0",
+  blueLink:   "#2c6eff",
+  // Spacing
+  sp4: 4, sp8: 8, sp12: 12, sp16: 16, sp20: 20, sp24: 24, sp32: 32,
 } as const;
 
 interface PainelMeiooProps {
@@ -34,18 +53,24 @@ const transacoes = [
   {
     grupo: "HOJE",
     items: [
-      { nome: "Tech Soluções ME",        detalhe: "Pix recebido",       valor: +1200.0, hora: "09:41", tipo: "entrada" },
-      { nome: "TechAvis Equipamentos",   detalhe: "Boleto liquidado",   valor: +1800.0, hora: "08:15", tipo: "entrada" },
+      { nome: "Educa Livros Ltda.",       detalhe: "Pix",  valor: +12500.0,  data: "18 Março", tipo: "entrada" },
+      { nome: "TechAula Equipamentos",    detalhe: "Pix",  valor: +7800.0,   data: "18 Março", tipo: "entrada" },
     ],
   },
   {
     grupo: "ESTA SEMANA",
     items: [
-      { nome: "Maria Silva Pereira",     detalhe: "Link de pagamento",  valor: +500.0,  hora: "Ontem, 14:22", tipo: "entrada" },
-      { nome: "Centros Escolar Sabores", detalhe: "Estorno",            valor: -3200.0, hora: "Seg, 11:00",   tipo: "saida" },
-      { nome: "Tarifa Meioo",            detalhe: "Boleto emitido",     valor: -3.5,    hora: "Sex, 09:30",   tipo: "saida" },
+      { nome: "Cantina Escolar Sabores",  detalhe: "Pix",  valor: -9200.0,   data: "18 Março", tipo: "saida" },
+      { nome: "Limpeza",                  detalhe: "Pix",  valor: +3450.0,   data: "18 Março", tipo: "entrada" },
     ],
   },
+];
+
+const acoes = [
+  { icon: QrCode,         label: "Pix",    tipo: "pix" as const },
+  { icon: CreditCard,     label: "Cartão", tipo: null },
+  { icon: DollarSign,     label: "Pagar",  tipo: null },
+  { icon: MoreHorizontal, label: "Mais",   tipo: null },
 ];
 
 export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooProps) {
@@ -61,27 +86,30 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
     <>
       {/* Overlay */}
       {aberto && (
-        <div className="fixed inset-0 z-40" style={{ background: "rgba(0,0,0,0.64)" }} onClick={onFechar} />
+        <div
+          className="fixed inset-0 z-40"
+          style={{ background: "rgba(0,0,0,0.64)" }}
+          onClick={onFechar}
+        />
       )}
 
       {/* Painel */}
       <div
         className="fixed top-0 left-0 h-full z-50 flex flex-col overflow-hidden"
         style={{
-          width: 296,
-          background: M.bg,
-          boxShadow: `8px 0 48px rgba(0,0,0,0.72)`,
+          width: 320,
+          background: M.black,
+          boxShadow: "8px 0 48px rgba(0,0,0,0.72)",
           transform: aberto ? "translateX(0)" : "translateX(-100%)",
           transition: "transform 300ms cubic-bezier(0.4,0,0.2,1)",
           fontFamily: "Inter, sans-serif",
         }}
       >
-        {/* ── Header ── */}
-        <div style={{ padding: `${M.sp24}px ${M.sp20}px ${M.sp16}px` }}>
+        {/* ═══════════════ DARK SECTION (top) ═══════════════ */}
+        <div style={{ background: M.black, padding: `${M.sp24}px ${M.sp20}px ${M.sp20}px`, flexShrink: 0 }}>
 
-          {/* Top bar: logo + actions */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: M.sp20 }}>
-            {/* Meioo logo */}
+          {/* Top bar: Meioo logo + close */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: M.sp24 }}>
             <div style={{ display: "flex", alignItems: "center", gap: M.sp8 }}>
               <div style={{
                 width: 28, height: 20, borderRadius: 4,
@@ -92,179 +120,235 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
                   <path d={MEIOO_ICON_PATH} fill={M.black} />
                 </svg>
               </div>
-              <span style={{ color: M.white, fontWeight: 700, fontSize: 14, letterSpacing: -0.3 }}>
+              <span style={{ color: M.white, fontWeight: 700, fontSize: 15, letterSpacing: -0.3 }}>
                 Meioo
               </span>
             </div>
 
-            {/* Icons */}
-            <div style={{ display: "flex", gap: M.sp4 }}>
-              <button
-                style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: M.muted }}
-                onMouseEnter={e => (e.currentTarget.style.background = M.divider)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-              >
-                <Bell size={15} />
-              </button>
-              <button
-                onClick={onFechar}
-                style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: M.muted }}
-                onMouseEnter={e => (e.currentTarget.style.background = M.divider)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-              >
-                <X size={15} />
-              </button>
-            </div>
+            <button
+              onClick={onFechar}
+              style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: "transparent", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: M.muted,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = M.darkCard)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+            >
+              <X size={16} />
+            </button>
           </div>
 
           {/* Saldo */}
-          <div style={{ marginBottom: M.sp20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: M.sp8, marginBottom: M.sp4 }}>
-              <span style={{ color: M.muted, fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          <div style={{ marginBottom: M.sp24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: M.sp8, marginBottom: M.sp8 }}>
+              <span style={{
+                color: M.muted, fontSize: 11, fontWeight: 600,
+                letterSpacing: "0.08em", textTransform: "uppercase",
+              }}>
                 Seu saldo
               </span>
               <button
                 onClick={() => setSaldoVisivel(v => !v)}
                 style={{ background: "none", border: "none", cursor: "pointer", color: M.dim, padding: 0, display: "flex" }}
               >
-                {saldoVisivel ? <Eye size={13} /> : <EyeOff size={13} />}
+                {saldoVisivel ? <Eye size={14} /> : <EyeOff size={14} />}
               </button>
             </div>
-            <div style={{ color: M.white, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1 }}>
-              {saldoVisivel ? "R$ 1.849,00" : "R$ ••••••"}
+            <div style={{
+              color: M.white, fontSize: 32, fontWeight: 800,
+              letterSpacing: -1.5, lineHeight: 1,
+            }}>
+              {saldoVisivel ? "R$12.650,00" : "R$ ••••••"}
             </div>
           </div>
 
-          {/* Ações rápidas */}
-          <div>
-            <div style={{ color: M.dim, fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: M.sp12 }}>
-              Cobrar
+          {/* Cartões */}
+          <div style={{ marginBottom: M.sp24 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: M.sp12 }}>
+              <span style={{
+                color: M.muted, fontSize: 11, fontWeight: 600,
+                letterSpacing: "0.08em", textTransform: "uppercase",
+              }}>
+                Cartões
+              </span>
+              <button style={{
+                width: 22, height: 22, borderRadius: 6,
+                border: `1px solid ${M.dividerDk}`, background: "transparent",
+                color: M.muted, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Plus size={12} />
+              </button>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: M.sp8 }}>
-              {[
-                { tipo: "pix" as const,    icon: QrCode,       label: "Pix" },
-                { tipo: "boleto" as const, icon: FileText,     label: "Boleto" },
-                { tipo: "link" as const,   icon: ExternalLink, label: "Link" },
-              ].map(({ tipo, icon: Icon, label }) => (
-                <button
-                  key={tipo}
-                  onClick={() => { onFechar(); onAbrirCobranca(tipo); }}
+            <div style={{ display: "flex", gap: M.sp8 }}>
+              {/* Green Meioo card */}
+              <div style={{
+                width: 64, height: 40, borderRadius: 4,
+                background: M.primary,
+                display: "flex", alignItems: "flex-end", justifyContent: "flex-start",
+                padding: 5,
+              }}>
+                <svg viewBox={MEIOO_ICON_VB} width={14} height={10} fill="none" aria-hidden>
+                  <path d={MEIOO_ICON_PATH} fill={M.black} />
+                </svg>
+              </div>
+              {/* Gray card */}
+              <div style={{
+                width: 64, height: 40, borderRadius: 4,
+                background: "#DFDFDF",
+                display: "flex", alignItems: "flex-end", justifyContent: "flex-start",
+                padding: 5,
+              }}>
+                <div style={{ width: 20, height: 3, borderRadius: 1, background: "#bbb" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Action pills — Pix, Cartão, Pagar, Mais */}
+          <div style={{ display: "flex", gap: M.sp8, justifyContent: "flex-start" }}>
+            {acoes.map(({ icon: Icon, label, tipo }) => (
+              <button
+                key={label}
+                onClick={() => {
+                  if (tipo) { onFechar(); onAbrirCobranca(tipo); }
+                }}
+                style={{
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                  background: "transparent", border: "none", cursor: tipo ? "pointer" : "default",
+                  padding: 0,
+                }}
+              >
+                <div
                   style={{
-                    background: M.card,
-                    border: `1px solid ${M.divider}`,
-                    borderRadius: 12,
-                    padding: `${M.sp12}px ${M.sp8}px`,
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: M.sp8,
-                    transition: "border-color 150ms, background 150ms",
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = M.primary;
-                    (e.currentTarget as HTMLElement).style.background = "#2a3029";
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = M.divider;
-                    (e.currentTarget as HTMLElement).style.background = M.card;
-                  }}
-                >
-                  <div style={{
-                    width: 32, height: 32, borderRadius: 8,
-                    background: `${M.primary}18`,
+                    width: 48, height: 34, borderRadius: 17,
+                    background: M.darkCard,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <Icon size={15} color={M.primary} />
-                  </div>
-                  <span style={{ color: M.offWhite, fontSize: 11, fontWeight: 500 }}>{label}</span>
-                </button>
-              ))}
-            </div>
+                    transition: "background 150ms",
+                  }}
+                  onMouseEnter={e => { if (tipo) e.currentTarget.style.background = "#2a2e35"; }}
+                  onMouseLeave={e => { if (tipo) e.currentTarget.style.background = M.darkCard; }}
+                >
+                  <Icon size={15} color={M.white} />
+                </div>
+                <span style={{ color: M.offWhite, fontSize: 10, fontWeight: 500 }}>{label}</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: M.divider, margin: `0 ${M.sp20}px` }} />
-
-        {/* ── Transações ── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: `${M.sp16}px ${M.sp20}px` }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: M.sp16 }}>
-            <span style={{ color: M.white, fontSize: 14, fontWeight: 700 }}>Transações</span>
-            <button style={{ background: "none", border: "none", cursor: "pointer", color: M.dim, fontSize: 11, display: "flex", alignItems: "center", gap: 2 }}>
-              Ver todas <ChevronRight size={11} />
-            </button>
+        {/* ═══════════════ LIGHT SECTION (transactions) ═══════════════ */}
+        <div style={{
+          flex: 1, overflowY: "auto",
+          background: M.lightBg,
+          borderRadius: "16px 16px 0 0",
+          padding: `${M.sp24}px ${M.sp20}px`,
+        }}>
+          {/* Header */}
+          <div style={{ marginBottom: M.sp4 }}>
+            <span style={{ color: M.lightText, fontSize: 16, fontWeight: 700 }}>
+              Transações
+            </span>
           </div>
+          <p style={{ color: M.lightSub, fontSize: 11, marginBottom: M.sp20, lineHeight: 1.4 }}>
+            Confira as últimas transações realizadas hoje:
+          </p>
 
+          {/* Grouped transactions */}
           {transacoes.map((grupo) => (
-            <div key={grupo.grupo} style={{ marginBottom: M.sp16 }}>
-              <div style={{ color: M.dim, fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: M.sp8 }}>
+            <div key={grupo.grupo} style={{ marginBottom: M.sp20 }}>
+              <div style={{
+                color: M.lightSub, fontSize: 10, fontWeight: 600,
+                letterSpacing: "0.08em", textTransform: "uppercase",
+                marginBottom: M.sp12,
+              }}>
                 {grupo.grupo}
               </div>
 
-              {grupo.items.map((t, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: M.sp12,
-                    padding: `${M.sp8}px ${M.sp4}px`,
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    transition: "background 100ms",
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.background = M.divider)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                >
-                  {/* Ícone de direção */}
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10,
-                    background: t.tipo === "entrada" ? `${M.primary}18` : `${M.divider}`,
-                    border: `1px solid ${t.tipo === "entrada" ? `${M.primary}30` : M.divider}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                  }}>
-                    {t.tipo === "entrada"
-                      ? <ArrowDownLeft size={15} color={M.primary} />
-                      : <ArrowUpRight size={15} color={M.muted} />
-                    }
-                  </div>
-
-                  {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: M.offWhite, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {t.nome}
+              <div style={{ display: "flex", flexDirection: "column", gap: M.sp8 }}>
+                {grupo.items.map((t, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex", alignItems: "center", gap: M.sp12,
+                      padding: `${M.sp12}px ${M.sp16}px`,
+                      borderRadius: 12,
+                      background: M.lightBg,
+                      border: `1px solid ${M.lightBorder}`,
+                      cursor: "pointer",
+                      transition: "box-shadow 150ms",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
+                  >
+                    {/* Direction icon */}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 18,
+                      background: t.tipo === "entrada" ? M.greenBadge : M.grayBadge,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0,
+                    }}>
+                      {t.tipo === "entrada"
+                        ? <ArrowDownLeft size={16} color={M.greenText} />
+                        : <ArrowUpRight size={16} color={M.lightSub} />
+                      }
                     </div>
-                    <div style={{ color: M.dim, fontSize: 10, marginTop: 2 }}>
-                      {t.detalhe} · {t.hora}
+
+                    {/* Info — amount on left, name+type on right */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        color: t.tipo === "entrada" ? M.blueLink : M.lightText,
+                        fontSize: 13, fontWeight: 700,
+                      }}>
+                        {t.tipo === "entrada" ? "+" : ""}
+                        R${Math.abs(t.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+
+                    {/* Right: name + detail */}
+                    <div style={{ textAlign: "right", minWidth: 0, flexShrink: 0, maxWidth: "50%" }}>
+                      <div style={{
+                        color: t.tipo === "entrada" ? M.blueLink : M.lightText,
+                        fontSize: 12, fontWeight: 600,
+                        whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                      }}>
+                        {t.nome}
+                      </div>
+                      <div style={{ color: M.lightSub, fontSize: 10, marginTop: 1 }}>
+                        {t.detalhe}
+                      </div>
+                    </div>
+
+                    {/* Date on far right */}
+                    <div style={{ color: M.lightSub, fontSize: 10, flexShrink: 0, whiteSpace: "nowrap" }}>
+                      {t.data}
                     </div>
                   </div>
-
-                  {/* Valor */}
-                  <span style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    flexShrink: 0,
-                    color: t.tipo === "entrada" ? M.primary : M.muted,
-                  }}>
-                    {t.tipo === "entrada" ? "+" : ""}
-                    {Math.abs(t.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           ))}
+
+          {/* Link to all transactions */}
+          <button style={{
+            display: "flex", alignItems: "center", gap: 4,
+            background: "none", border: "none", cursor: "pointer",
+            color: M.blueLink, fontSize: 12, fontWeight: 600,
+            padding: `${M.sp8}px 0`,
+          }}>
+            <span style={{ fontSize: 16 }}>≡</span>
+            Ir para Transações
+          </button>
         </div>
 
         {/* ── Footer ── */}
         <div style={{
-          borderTop: `1px solid ${M.divider}`,
+          background: M.lightBg,
+          borderTop: `1px solid ${M.lightBorder}`,
           padding: `${M.sp12}px ${M.sp20}px`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: M.sp8,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: M.sp8,
+          flexShrink: 0,
         }}>
           <div style={{
             width: 18, height: 13, borderRadius: 3,
@@ -275,9 +359,9 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
               <path d={MEIOO_ICON_PATH} fill={M.black} />
             </svg>
           </div>
-          <span style={{ color: M.dim, fontSize: 10 }}>
+          <span style={{ color: M.lightSub, fontSize: 10 }}>
             Conta digital operada pela{" "}
-            <span style={{ color: M.muted, fontWeight: 600 }}>Meioo</span>
+            <span style={{ color: M.lightText, fontWeight: 600 }}>Meioo</span>
           </span>
         </div>
       </div>

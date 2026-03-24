@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Home,
   Package,
@@ -30,6 +31,7 @@ interface NavChild {
   active?: boolean;
   meioo?: boolean;
   hasChildren?: boolean;
+  href?: string;
 }
 
 interface NavItem {
@@ -111,18 +113,82 @@ const navItems: NavItem[] = [
     label: "Financeiro",
     active: true,
     children: [
-      { label: "Contas a Receber", active: true, meioo: true },
-      { label: "Contas a Pagar" },
+      { label: "Caixa", hasChildren: true },
+      { label: "Lançamento Financeiro" },
+      { label: "Consultar Lançamentos" },
+      { label: "Recebimentos de Cartões" },
+      { label: "Lançamentos Recorrentes" },
+      { label: "Contas em Aberto de Clientes" },
+      { label: "Contas em Aberto por Documentos" },
+      { label: "Boletos", hasChildren: true },
+      { label: "Custo Fixo", hasChildren: true },
+      { label: "Extrato Bancário", hasChildren: true },
+      { label: "Controle de Cheques" },
+      { label: "Movimentação entre Contas" },
+      { label: "Consultar Transações/Integrações" },
+      { label: "divider" },
+      { label: "Contas a Receber", active: true, meioo: true, href: "/financeiro/contas-a-receber" },
+      { label: "Contas a Pagar", meioo: true },
       { label: "Cobranças Bancárias", meioo: true, hasChildren: true },
-      { label: "Extratos Bancários" },
-      { label: "Relatórios" },
     ],
   },
-  { icon: ShoppingCart, label: "Caixa Venda" },
-  { icon: Settings, label: "Configuração" },
-  { icon: CalendarRange, label: "Agenda" },
-  { icon: Percent, label: "Promoções" },
-  { icon: GemIcon, label: "Programa Fidelidade" },
+  {
+    icon: ShoppingCart,
+    label: "Pedido de Compra",
+    children: [
+      { label: "Cadastrar" },
+      { label: "Consultar" },
+      { label: "Cotação", hasChildren: true },
+    ],
+  },
+  {
+    icon: Settings,
+    label: "Assinador",
+    children: [
+      { label: "Painel de Assinaturas" },
+    ],
+  },
+  {
+    icon: CalendarRange,
+    label: "Agenda",
+    children: [
+      { label: "Agenda de Compromissos" },
+      { label: "Agenda de Cobranças" },
+    ],
+  },
+  {
+    icon: Percent,
+    label: "Fiscal",
+    children: [
+      { label: "Lançamentos", hasChildren: true },
+      { label: "Arquivos Fiscais", hasChildren: true },
+      { label: "Registro de Inventário", hasChildren: true },
+      { label: "Gestão de Documentos" },
+    ],
+  },
+  {
+    icon: GemIcon,
+    label: "Estoque",
+    children: [
+      { label: "Entradas" },
+      { label: "Entradas e Saídas" },
+      { label: "Entradas e Saídas Detalhado" },
+      { label: "Curva ABC" },
+      { label: "Últimas Vendas" },
+      { label: "Estoque Sintético" },
+      { label: "Lucro de Estoque" },
+      { label: "Tabela de Preços" },
+      { label: "Giro de Mercadorias" },
+      { label: "Quantidade em Estoque" },
+      { label: "Estoque por Localização" },
+      { label: "Estoque Mínimo/Máximo" },
+      { label: "Posição Atual do Estoque" },
+      { label: "Ajuste de Estoque em Lote" },
+      { label: "Ajuste de Estoque por Produto" },
+      { label: "Quantidade em Estoque/Grade" },
+      { label: "Contagem Estoque/Ajuste de Estoque" },
+    ],
+  },
   { icon: Building2, label: "Empresas" },
   { icon: Truck, label: "Logística" },
   { icon: Headset, label: "Suporte" },
@@ -133,6 +199,7 @@ interface AvanteSidebarProps {
 }
 
 export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
+  const router = useRouter();
   const [flyoutItem, setFlyoutItem] = useState<NavItem | null>(null);
 
   function handleIconClick(item: NavItem) {
@@ -221,29 +288,41 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
 
             {/* Sub-items — scrollable */}
             <nav className="flex-1 overflow-y-auto py-2">
-              {flyoutItem.children.map((child) => (
+              {flyoutItem.children.map((child) => {
+                if (child.label === "divider") {
+                  return <div key="divider" className="mx-4 my-2 border-b border-border" />;
+                }
+                return (
                 <button
                   key={child.label}
+                  onClick={() => {
+                    if (child.href) {
+                      setFlyoutItem(null);
+                      router.push(child.href);
+                    }
+                  }}
                   className={`w-full flex items-center gap-2 px-5 py-3 text-sm transition-colors hover:bg-bg text-left
-                    ${child.active ? "text-primary font-semibold" : "text-dark/70 hover:text-dark"}`}
+                    ${child.active ? "text-primary font-semibold" : "text-dark/70 hover:text-dark"}
+                    ${child.href ? "cursor-pointer" : ""}`}
                 >
-                  <span className="flex-1">{child.label}</span>
                   {child.meioo && (
                     <span
                       className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
-                      style={{ width: 12, height: 9 }}
-                      title="Integrado com Meioo"
+                      style={{ width: 14, height: 10 }}
+                      title="Meioo"
                     >
-                      <svg viewBox={MEIOO_ICON_VB} width={9} height={7} fill="none" aria-hidden>
+                      <svg viewBox={MEIOO_ICON_VB} width={10} height={7} fill="none" aria-hidden>
                         <path d={MEIOO_ICON_PATH} fill="white" />
                       </svg>
                     </span>
                   )}
+                  <span className="flex-1">{child.label}</span>
                   {child.hasChildren && (
                     <ChevronRight size={14} className="text-muted shrink-0" />
                   )}
                 </button>
-              ))}
+                );
+              })}
             </nav>
           </div>
         </>
