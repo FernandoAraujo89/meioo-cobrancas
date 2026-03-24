@@ -13,7 +13,7 @@ import {
   Truck,
   Users,
   ChevronRight,
-  ChevronDown,
+  ArrowLeft,
 } from "lucide-react";
 import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
@@ -21,7 +21,7 @@ interface NavItem {
   icon: React.ElementType;
   label: string;
   active?: boolean;
-  children?: { label: string; active?: boolean; meioo?: boolean }[];
+  children?: { label: string; active?: boolean; meioo?: boolean; hasChildren?: boolean }[];
 }
 
 const navItems: NavItem[] = [
@@ -38,7 +38,7 @@ const navItems: NavItem[] = [
     children: [
       { label: "Contas a Receber", active: true, meioo: true },
       { label: "Contas a Pagar" },
-      { label: "Cobranças Bancárias", meioo: true },
+      { label: "Cobranças Bancárias", meioo: true, hasChildren: true },
       { label: "Extratos Bancários" },
       { label: "Relatórios" },
     ],
@@ -53,101 +53,119 @@ interface AvanteSidebarProps {
 }
 
 export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
-  const [expanded, setExpanded] = useState<string>("Financeiro");
+  const [flyoutItem, setFlyoutItem] = useState<NavItem | null>(null);
+
+  function handleIconClick(item: NavItem) {
+    if (item.children) {
+      setFlyoutItem(flyoutItem?.label === item.label ? null : item);
+    }
+  }
 
   return (
-    <aside className="w-[200px] bg-surface border-r border-border flex flex-col shrink-0 overflow-hidden">
-      {/* Nav items */}
-      <nav className="flex-1 overflow-y-auto py-2">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isExpanded = expanded === item.label;
+    <div className="flex shrink-0 h-full relative">
+      {/* Icon rail — always visible, 56px */}
+      <aside className="w-14 bg-surface border-r border-border flex flex-col shrink-0 z-20">
+        <nav className="flex-1 overflow-y-auto py-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isOpen = flyoutItem?.label === item.label;
 
-          return (
-            <div key={item.label}>
+            return (
               <button
-                onClick={() =>
-                  item.children && setExpanded(isExpanded ? "" : item.label)
-                }
-                className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors hover:bg-bg text-left
-                  ${item.active ? "text-primary" : "text-dark/70 hover:text-dark"}`}
+                key={item.label}
+                onClick={() => handleIconClick(item)}
+                className={`w-full flex items-center justify-center py-3 transition-colors hover:bg-bg relative
+                  ${item.active || isOpen ? "text-primary" : "text-muted hover:text-dark"}`}
+                title={item.label}
               >
-                <Icon
-                  size={15}
-                  className={item.active ? "text-primary" : "text-muted"}
-                />
-                <span className="flex-1">{item.label}</span>
-                {item.children &&
-                  (isExpanded ? (
-                    <ChevronDown size={12} className="text-muted" />
-                  ) : (
-                    <ChevronRight size={12} className="text-muted" />
-                  ))}
+                {(item.active || isOpen) && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full" />
+                )}
+                <Icon size={18} />
               </button>
+            );
+          })}
+        </nav>
 
-              {item.children && isExpanded && (
-                <div className="bg-bg/60">
-                  {item.children.map((child) => (
-                    <button
-                      key={child.label}
-                      className={`w-full flex items-center gap-2 pl-10 pr-3 py-2 text-xs transition-colors hover:bg-bg text-left
-                        ${child.active ? "text-primary font-semibold" : "text-dark/60 hover:text-dark"}`}
-                    >
-                      {child.active && (
-                        <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
-                      )}
-                      <span className={`flex-1 ${child.active ? "" : "pl-3"}`}>
-                        {child.label}
-                      </span>
-                      {child.meioo && (
-                        <span
-                          className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
-                          style={{ width: 12, height: 9 }}
-                          title="Integrado com Meioo"
-                        >
-                          <svg viewBox={MEIOO_ICON_VB} width={9} height={7} fill="none" aria-hidden>
-                            <path d={MEIOO_ICON_PATH} fill="white" />
-                          </svg>
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-
-      {/* Divisor + Ícone Meioo fixo no rodapé */}
-      <div className="shrink-0 border-t border-border">
-        <button
-          onClick={onAbrirMeioo}
-          className="w-full flex items-center gap-2.5 px-4 py-3.5 hover:bg-bg transition-colors group"
-          title="Meioo — Conta Digital Avante"
-        >
-          {/* Ícone retangular Meioo */}
-          <div
-            className="flex items-center justify-center rounded-[3px] bg-dark group-hover:bg-primary transition-colors shrink-0"
-            style={{ width: 20, height: 14 }}
+        {/* Meioo footer */}
+        <div className="shrink-0 border-t border-border">
+          <button
+            onClick={onAbrirMeioo}
+            className="w-full flex items-center justify-center py-3 hover:bg-bg transition-colors group"
+            title="Meioo — Conta Digital Avante"
           >
-            <svg viewBox={MEIOO_ICON_VB} width={15} height={11} fill="none" aria-hidden>
-              <path d={MEIOO_ICON_PATH} fill="white" />
-            </svg>
+            <div
+              className="flex items-center justify-center rounded-[3px] bg-dark group-hover:bg-primary transition-colors shrink-0"
+              style={{ width: 20, height: 14 }}
+            >
+              <svg viewBox={MEIOO_ICON_VB} width={15} height={11} fill="none" aria-hidden>
+                <path d={MEIOO_ICON_PATH} fill="white" />
+              </svg>
+            </div>
+          </button>
+        </div>
+      </aside>
+
+      {/* Flyout panel — sub-navigation */}
+      {flyoutItem && flyoutItem.children && (
+        <>
+          {/* Backdrop to close flyout */}
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setFlyoutItem(null)}
+          />
+
+          <div
+            className="absolute left-14 top-0 h-full bg-surface border-r border-border z-20 shadow-panel"
+            style={{ width: 280 }}
+          >
+            {/* Flyout header */}
+            <div className="flex items-center gap-3 px-4 py-4 border-b border-border">
+              {(() => {
+                const FlyIcon = flyoutItem.icon;
+                return <FlyIcon size={18} className="text-primary shrink-0" />;
+              })()}
+              <span className="text-sm font-bold text-dark flex-1">{flyoutItem.label}</span>
+              <button
+                onClick={() => setFlyoutItem(null)}
+                className="w-7 h-7 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark transition-colors"
+              >
+                <ArrowLeft size={15} />
+              </button>
+            </div>
+
+            {/* Divider line */}
+            <div className="mx-4 border-b border-primary/30" />
+
+            {/* Sub-items */}
+            <nav className="py-2">
+              {flyoutItem.children.map((child) => (
+                <button
+                  key={child.label}
+                  className={`w-full flex items-center gap-2 px-5 py-3 text-sm transition-colors hover:bg-bg text-left
+                    ${child.active ? "text-primary font-semibold" : "text-dark/70 hover:text-dark"}`}
+                >
+                  <span className="flex-1">{child.label}</span>
+                  {child.meioo && (
+                    <span
+                      className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
+                      style={{ width: 12, height: 9 }}
+                      title="Integrado com Meioo"
+                    >
+                      <svg viewBox={MEIOO_ICON_VB} width={9} height={7} fill="none" aria-hidden>
+                        <path d={MEIOO_ICON_PATH} fill="white" />
+                      </svg>
+                    </span>
+                  )}
+                  {child.hasChildren && (
+                    <ChevronRight size={14} className="text-muted shrink-0" />
+                  )}
+                </button>
+              ))}
+            </nav>
           </div>
-          <div className="flex-1 text-left">
-            <p className="text-xs font-semibold text-dark group-hover:text-primary transition-colors leading-tight">
-              Meioo
-            </p>
-            <p className="text-[10px] text-muted leading-tight">Conta Digital</p>
-          </div>
-          {/* Indicador de saldo */}
-          <div className="text-right">
-            <p className="text-[10px] font-semibold text-dark leading-tight">R$ 1.849</p>
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 ml-auto mt-0.5" />
-          </div>
-        </button>
-      </div>
-    </aside>
+        </>
+      )}
+    </div>
   );
 }
