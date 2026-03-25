@@ -25,15 +25,47 @@ const tabs = [
   { label: "Todos",      count: 7, active: true  },
 ];
 
+// Conta atrasada fixa para o botão "Pagar agora" do alerta
+const CONTA_ATRASADA = { id: 1, fornecedor: "Fornecedora ABC Ltda.", vencimento: "20/08/2025", valor: 3200.00, saldo: 12650.00 };
+
 export default function ContasAPagarPage() {
   const [activeTab, setActiveTab] = useState("Todos");
   const [painelMeiooAberto, setPainelMeiooAberto] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [showPagarModal, setShowPagarModal] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [contaModal, setContaModal] = useState(CONTA_ATRASADA);
+  const [confirmando, setConfirmando] = useState(false);
+  const [pagoOk, setPagoOk] = useState(false);
+
+  function handlePagarAgora() {
+    setContaModal(CONTA_ATRASADA);
+    setShowPagarModal(true);
+    setPagoOk(false);
+  }
 
   function handlePagar(id: string) {
-    setSelectedId(id);
+    setContaModal({ ...CONTA_ATRASADA, id: Number(id) });
     setShowPagarModal(true);
+    setPagoOk(false);
+  }
+
+  async function confirmarPagamento() {
+    setConfirmando(true);
+    const res = await fetch("/api/pagamentos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contaId: contaModal.id }),
+    });
+    setConfirmando(false);
+    if (res.ok) {
+      setPagoOk(true);
+      setTimeout(() => {
+        setShowPagarModal(false);
+        setPagoOk(false);
+        setRefreshKey(k => k + 1);
+        setPainelMeiooAberto(true);
+      }, 1800);
+    }
   }
 
   return (
@@ -90,7 +122,10 @@ export default function ContasAPagarPage() {
               <p className="text-xs text-danger font-medium">
                 Você possui <strong>1 conta atrasada</strong> no valor de <strong>R$ 3.200,00</strong>. Regularize para evitar juros e multas.
               </p>
-              <button className="ml-auto shrink-0 h-6 px-3 rounded-md bg-danger text-white text-[11px] font-semibold hover:bg-danger/90 transition-colors">
+              <button
+                onClick={handlePagarAgora}
+                className="ml-auto shrink-0 h-6 px-3 rounded-md bg-danger text-white text-[11px] font-semibold hover:bg-danger/90 transition-colors"
+              >
                 Pagar agora
               </button>
             </div>
@@ -198,58 +233,78 @@ export default function ContasAPagarPage() {
       {/* Modal confirmação de pagamento */}
       {showPagarModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowPagarModal(false)}
-          />
+          <div className="absolute inset-0 bg-black/40" onClick={() => !confirmando && setShowPagarModal(false)} />
           <div className="relative bg-surface rounded-xl shadow-xl border border-border w-[400px] p-6 z-10">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <MeiooIcon size={20} variant="badge" />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-dark">Confirmar pagamento</h2>
-                <p className="text-xs text-muted mt-0.5">Via Conta Digital Meioo</p>
-              </div>
-            </div>
 
-            <div className="bg-bg rounded-lg p-4 mb-4 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted">Fornecedor</span>
-                <span className="font-medium text-dark">Fornecedora ABC Ltda.</span>
+            {pagoOk ? (
+              /* ── Sucesso ── */
+              <div className="flex flex-col items-center py-4 gap-3">
+                <div className="w-14 h-14 rounded-full bg-success-bg flex items-center justify-center">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-success"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h2 className="text-sm font-bold text-dark">Pagamento realizado!</h2>
+                <p className="text-xs text-muted text-center">
+                  R$ {contaModal.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} debitado da sua Conta Digital Meioo.<br/>Abrindo o painel…
+                </p>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Vencimento</span>
-                <span className="font-medium text-danger">20/08/2025 (atrasado)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Valor</span>
-                <span className="font-bold text-dark">R$ 3.200,00</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Saldo disponível</span>
-                <span className="font-medium text-success">R$ 12.650,00</span>
-              </div>
-            </div>
+            ) : (
+              /* ── Confirmação ── */
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <MeiooIcon size={20} variant="badge" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold text-dark">Confirmar pagamento</h2>
+                    <p className="text-xs text-muted mt-0.5">Via Conta Digital Meioo</p>
+                  </div>
+                </div>
 
-            <p className="text-[11px] text-muted mb-4">
-              O valor será debitado da sua Conta Digital Meioo. Esta operação não pode ser desfeita.
-            </p>
+                <div className="bg-bg rounded-lg p-4 mb-4 space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted">Fornecedor</span>
+                    <span className="font-medium text-dark">{contaModal.fornecedor}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted">Vencimento</span>
+                    <span className="font-medium text-danger">{contaModal.vencimento} (atrasado)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted">Valor</span>
+                    <span className="font-bold text-dark">
+                      R$ {contaModal.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted">Saldo disponível</span>
+                    <span className="font-medium text-success">
+                      R$ {contaModal.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowPagarModal(false)}
-                className="flex-1 h-9 rounded-lg border border-border text-xs font-medium text-dark hover:bg-bg transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => setShowPagarModal(false)}
-                className="flex-1 h-9 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors"
-              >
-                Confirmar pagamento
-              </button>
-            </div>
+                <p className="text-[11px] text-muted mb-4">
+                  O valor será debitado da sua Conta Digital Meioo. Esta operação não pode ser desfeita.
+                </p>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowPagarModal(false)}
+                    disabled={confirmando}
+                    className="flex-1 h-9 rounded-lg border border-border text-xs font-medium text-dark hover:bg-bg transition-colors disabled:opacity-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmarPagamento}
+                    disabled={confirmando}
+                    className="flex-1 h-9 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors disabled:opacity-70"
+                  >
+                    {confirmando ? "Processando…" : "Confirmar pagamento"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -258,6 +313,7 @@ export default function ContasAPagarPage() {
         aberto={painelMeiooAberto}
         onFechar={() => setPainelMeiooAberto(false)}
         onAbrirCobranca={() => setPainelMeiooAberto(false)}
+        refreshKey={refreshKey}
       />
     </div>
   );

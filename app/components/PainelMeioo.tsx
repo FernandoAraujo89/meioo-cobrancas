@@ -47,24 +47,12 @@ interface PainelMeiooProps {
   aberto: boolean;
   onFechar: () => void;
   onAbrirCobranca: (tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") => void;
+  refreshKey?: number;
 }
 
-const transacoes = [
-  {
-    grupo: "HOJE",
-    items: [
-      { nome: "Educa Livros Ltda.",       detalhe: "Pix",  valor: +12500.0,  data: "18 Março", tipo: "entrada" },
-      { nome: "TechAula Equipamentos",    detalhe: "Pix",  valor: +7800.0,   data: "18 Março", tipo: "entrada" },
-    ],
-  },
-  {
-    grupo: "ESTA SEMANA",
-    items: [
-      { nome: "Cantina Escolar Sabores",  detalhe: "Pix",  valor: -9200.0,   data: "18 Março", tipo: "saida" },
-      { nome: "Limpeza",                  detalhe: "Pix",  valor: +3450.0,   data: "18 Março", tipo: "entrada" },
-    ],
-  },
-];
+interface Transacao {
+  nome: string; detalhe: string; valor: number; tipo: string; data: string;
+}
 
 const acoes = [
   { icon: QrCode,         label: "Pix",    tipo: "pix" as const },
@@ -76,8 +64,10 @@ const acoes = [
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 640;
 
-export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooProps) {
+export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0 }: PainelMeiooProps) {
   const [saldoVisivel, setSaldoVisivel] = useState(true);
+  const [saldo, setSaldo] = useState<number | null>(null);
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [panelWidth, setPanelWidth] = useState(320);
   const [isDesktop, setIsDesktop] = useState(false);
   const isResizing = useRef(false);
@@ -88,6 +78,17 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
   useEffect(() => {
     setIsDesktop(window.matchMedia("(pointer: fine)").matches);
   }, []);
+
+  // Fetch saldo + transacoes da API sempre que abrir ou refreshKey mudar
+  useEffect(() => {
+    if (!aberto) return;
+    fetch("/api/saldo")
+      .then(r => r.json())
+      .then(d => {
+        setSaldo(d.saldo);
+        setTransacoes(d.transacoes);
+      });
+  }, [aberto, refreshKey]);
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onFechar(); };
@@ -210,7 +211,11 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
               color: M.white, fontSize: 32, fontWeight: 800,
               letterSpacing: -1.5, lineHeight: 1,
             }}>
-              {saldoVisivel ? "R$12.650,00" : "R$ ••••••"}
+              {saldoVisivel
+                ? saldo !== null
+                  ? `R$${saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                  : "Carregando..."
+                : "R$ ••••••"}
             </div>
           </div>
 
@@ -304,7 +309,12 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
           </p>
 
           {/* Grouped transactions */}
-          {transacoes.map((grupo) => (
+          {transacoes.length === 0 && (
+            <p style={{ color: M.lightSub, fontSize: 12, textAlign: "center", padding: "20px 0" }}>
+              Nenhuma transação ainda.
+            </p>
+          )}
+          {transacoes.length > 0 && [{ grupo: "RECENTES", items: transacoes }].map((grupo) => (
             <div key={grupo.grupo} style={{ marginBottom: M.sp20 }}>
               <div style={{
                 color: M.lightSub, fontSize: 10, fontWeight: 600,
