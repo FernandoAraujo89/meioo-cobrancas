@@ -128,7 +128,7 @@ const navItems: NavItem[] = [
       { label: "Consultar Transações/Integrações" },
       { label: "divider" },
       { label: "Contas a Receber", active: true, meioo: true, href: "/financeiro/contas-a-receber" },
-      { label: "Contas a Pagar", meioo: true },
+      { label: "Contas a Pagar", meioo: true, href: "/financeiro/contas-a-pagar" },
       { label: "Cobranças Bancárias", meioo: true, hasChildren: true },
     ],
   },
