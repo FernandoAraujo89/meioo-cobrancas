@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Avante ERP — Meioo Cobranças",
+  title: "Avante Web",
   description: "Módulo de cobranças Meioo integrado ao Avante ERP",
 };
 
