@@ -295,34 +295,31 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
                       }
                     </div>
 
-                    {/* Info — amount on left, name+type on right */}
+                    {/* Nome + tipo (cresce) */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
-                        color: t.tipo === "entrada" ? M.blueLink : M.lightText,
-                        fontSize: 13, fontWeight: 700,
-                      }}>
-                        {t.tipo === "entrada" ? "+" : ""}
-                        R${Math.abs(t.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </div>
-                    </div>
-
-                    {/* Right: name + detail */}
-                    <div style={{ textAlign: "right", minWidth: 0, flexShrink: 0, maxWidth: "50%" }}>
-                      <div style={{
-                        color: t.tipo === "entrada" ? M.blueLink : M.lightText,
+                        color: M.lightText,
                         fontSize: 12, fontWeight: 600,
                         whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                       }}>
                         {t.nome}
                       </div>
-                      <div style={{ color: M.lightSub, fontSize: 10, marginTop: 1 }}>
+                      <div style={{ color: M.lightSub, fontSize: 10, marginTop: 2 }}>
                         {t.detalhe}
                       </div>
                     </div>
 
-                    {/* Date on far right */}
-                    <div style={{ color: M.lightSub, fontSize: 10, flexShrink: 0, whiteSpace: "nowrap" }}>
-                      {t.data}
+                    {/* Valor + data (alinhados à direita) */}
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{
+                        color: t.tipo === "entrada" ? M.blueLink : M.lightText,
+                        fontSize: 13, fontWeight: 700, whiteSpace: "nowrap",
+                      }}>
+                        {t.tipo === "entrada" ? "+" : "-"}R${Math.abs(t.valor).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </div>
+                      <div style={{ color: M.lightSub, fontSize: 10, marginTop: 2, whiteSpace: "nowrap" }}>
+                        {t.data}
+                      </div>
                     </div>
                   </div>
                 ))}
