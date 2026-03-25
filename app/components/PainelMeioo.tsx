@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   X,
   Eye,
@@ -73,14 +73,53 @@ const acoes = [
   { icon: MoreHorizontal, label: "Mais",   tipo: "menu" as const },
 ];
 
+const MIN_WIDTH = 280;
+const MAX_WIDTH = 640;
+
 export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooProps) {
   const [saldoVisivel, setSaldoVisivel] = useState(true);
+  const [panelWidth, setPanelWidth] = useState(320);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const isResizing = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(0);
+
+  // Detect desktop (precise pointer = mouse) — runs only client-side
+  useEffect(() => {
+    setIsDesktop(window.matchMedia("(pointer: fine)").matches);
+  }, []);
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onFechar(); };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, [onFechar]);
+
+  function handleResizeMouseDown(e: React.MouseEvent) {
+    e.preventDefault();
+    isResizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = panelWidth;
+    document.body.style.cursor = "ew-resize";
+    document.body.style.userSelect = "none";
+
+    function onMouseMove(ev: MouseEvent) {
+      if (!isResizing.current) return;
+      const delta = ev.clientX - startX.current;
+      setPanelWidth(Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth.current + delta)));
+    }
+
+    function onMouseUp() {
+      isResizing.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  }
 
   return (
     <>
@@ -97,14 +136,31 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
       <div
         className="fixed top-0 left-0 h-full z-50 flex flex-col overflow-hidden"
         style={{
-          width: 320,
+          width: panelWidth,
           background: M.black,
           boxShadow: "8px 0 48px rgba(0,0,0,0.72)",
           transform: aberto ? "translateX(0)" : "translateX(-100%)",
-          transition: "transform 300ms cubic-bezier(0.4,0,0.2,1)",
+          transition: isResizing.current ? "none" : "transform 300ms cubic-bezier(0.4,0,0.2,1)",
           fontFamily: "Inter, sans-serif",
         }}
       >
+        {/* Resize handle — desktop only */}
+        {isDesktop && (
+          <div
+            onMouseDown={handleResizeMouseDown}
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              width: 6,
+              height: "100%",
+              cursor: "ew-resize",
+              zIndex: 10,
+              background: "transparent",
+            }}
+            title="Arraste para redimensionar"
+          />
+        )}
         {/* ═══════════════ DARK SECTION (top) ═══════════════ */}
         <div style={{ background: M.black, padding: `${M.sp24}px ${M.sp20}px ${M.sp20}px`, flexShrink: 0 }}>
 
