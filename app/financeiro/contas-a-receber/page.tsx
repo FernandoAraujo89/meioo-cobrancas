@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AvanteHeader } from "@/app/components/AvanteHeader";
 import { AvanteSidebar } from "@/app/components/AvanteSidebar";
-import { ContasReceberTable } from "@/app/components/cobranca/ContasReceberTable";
+import { ContasReceberTable, contarPorFiltro } from "@/app/components/cobranca/ContasReceberTable";
 import { PainelCobranca } from "@/app/components/cobranca/PainelCobranca";
 import { PainelMeioo } from "@/app/components/PainelMeioo";
 import { MeiooIcon } from "@/app/components/MeiooIcon";
@@ -18,19 +18,13 @@ import {
 
 type TipoFluxo = "menu" | "pix" | "boleto" | "link" | "cartao" | "pagar";
 
-const tabs = [
-  { label: "Em aberto", count: 5, active: false },
-  { label: "A vencer", count: 3, active: false },
-  { label: "Pendente", count: 0, active: false },
-  { label: "Recebido", count: 2, active: false },
-  { label: "Cancelado", count: 0, active: false },
-  { label: "Todos", count: 7, active: true },
-];
+const TAB_LABELS = ["Em aberto", "A vencer", "Pendente", "Recebido", "Cancelado", "Todos"];
 
 export default function ContasAReceberPage() {
   const [painelAberto, setPainelAberto] = useState(false);
   const [fluxo, setFluxo] = useState<TipoFluxo>("menu");
   const [painelMeiooAberto, setPainelMeiooAberto] = useState(false);
+  const [activeTab, setActiveTab] = useState("Todos");
 
   function abrirPainel(tipo: TipoFluxo = "menu") {
     setFluxo(tipo);
@@ -171,26 +165,29 @@ export default function ContasAReceberPage() {
 
             {/* Tabs */}
             <div className="flex items-center gap-0 border-b border-border mb-4">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.label}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px
-                    ${tab.active ? "border-primary text-primary" : "border-transparent text-muted hover:text-dark"}`}
-                >
-                  {tab.label}
-                  <span
-                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold
-                    ${tab.active ? "bg-primary/10 text-primary" : "bg-bg text-muted"}`}
+              {TAB_LABELS.map((label) => {
+                const isActive = activeTab === label;
+                const count = contarPorFiltro(label);
+                return (
+                  <button
+                    key={label}
+                    onClick={() => setActiveTab(label)}
+                    className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px
+                      ${isActive ? "border-primary text-primary" : "border-transparent text-muted hover:text-dark"}`}
                   >
-                    {tab.count}
-                  </span>
-                </button>
-              ))}
+                    {label}
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold
+                      ${isActive ? "bg-primary/10 text-primary" : "bg-bg text-muted"}`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Table */}
             <div id="cobrancas-table">
-              <ContasReceberTable />
+              <ContasReceberTable filtro={activeTab} />
             </div>
 
             {/* Meioo attribution */}

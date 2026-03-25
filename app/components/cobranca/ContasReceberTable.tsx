@@ -106,14 +106,36 @@ const meiooMeioLabel = {
   link: "Link",
 };
 
+const filtroParaStatus: Record<string, string[]> = {
+  "Em aberto":  ["em_aberto"],
+  "A vencer":   ["vencido"],
+  "Pendente":   ["pendente"],
+  "Recebido":   ["recebido"],
+  "Cancelado":  ["cancelado"],
+  "Todos":      [],
+};
+
+export function contarPorFiltro(filtro: string): number {
+  const statuses = filtroParaStatus[filtro];
+  if (!statuses || statuses.length === 0) return mockData.length;
+  return mockData.filter(r => statuses.includes(r.status)).length;
+}
+
 interface ContasReceberTableProps {
+  filtro?: string;
   onAcao?: (id: string, tipo: "pix" | "boleto" | "link") => void;
 }
 
-export function ContasReceberTable({ onAcao }: ContasReceberTableProps) {
+export function ContasReceberTable({ filtro = "Todos", onAcao }: ContasReceberTableProps) {
+  const statuses = filtroParaStatus[filtro] ?? [];
+  const rows = statuses.length === 0 ? mockData : mockData.filter(r => statuses.includes(r.status));
+
   return (
     <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-card">
-      <table className="w-full text-xs">
+      {rows.length === 0 && (
+        <p className="text-xs text-muted text-center py-10">Nenhuma cobrança nesta categoria.</p>
+      )}
+      {rows.length > 0 && <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-border bg-bg/50">
             <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
@@ -144,7 +166,7 @@ export function ContasReceberTable({ onAcao }: ContasReceberTableProps) {
           </tr>
         </thead>
         <tbody>
-          {mockData.map((row, idx) => {
+          {rows.map((row, idx) => {
             const st = statusConfig[row.status];
             return (
               <tr
@@ -205,7 +227,7 @@ export function ContasReceberTable({ onAcao }: ContasReceberTableProps) {
             );
           })}
         </tbody>
-      </table>
+      </table>}
     </div>
   );
 }
