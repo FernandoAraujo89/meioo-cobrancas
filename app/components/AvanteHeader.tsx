@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Search, ChevronDown, HelpCircle } from "lucide-react";
+import { useMeiooTour } from "./MeiooOnboarding";
 
 // Avante logo SVG paths (from logo_avante.svg)
 const AVANTE_PATHS = [
@@ -11,6 +12,13 @@ const AVANTE_PATHS = [
 ];
 
 export function AvanteHeader() {
+  const { startTour } = useMeiooTour();
+
+  function handleRestartTour() {
+    localStorage.removeItem("meioo_tour_done");
+    startTour();
+  }
+
   return (
     <header className="h-14 bg-surface border-b border-border flex items-center px-0 shrink-0 z-10">
       {/* Logo — fills the entire sidebar column */}
@@ -37,7 +45,11 @@ export function AvanteHeader() {
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
-          <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark transition-colors">
+          <button
+            onClick={handleRestartTour}
+            title="Reiniciar tour Meioo"
+            className="w-8 h-8 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark transition-colors"
+          >
             <HelpCircle size={16} />
           </button>
           <button className="w-8 h-8 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark transition-colors relative">

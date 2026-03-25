@@ -109,9 +109,12 @@ export function MeiooOnboarding() {
     const alreadySeen = localStorage.getItem(STORAGE_KEY);
     if (alreadySeen) return;
 
+    // Aguarda os elementos do sidebar estarem no DOM
     const timer = setTimeout(() => {
+      const hasSidebar = !!document.getElementById("financeiro-nav-btn");
+      if (!hasSidebar) return; // não está numa página com sidebar
       startTour();
-    }, 800);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [startTour]);
