@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const valor = Number(conta.saldo_devedor);
 
   // Verificar saldo
-  const [saldoRow] = await sql`SELECT saldo FROM meioo_saldo ORDER BY id LIMIT 1`;
+  const [saldoRow] = await sql`SELECT id, saldo FROM meioo_saldo ORDER BY id LIMIT 1`;
   const saldoAtual = Number(saldoRow.saldo);
   if (saldoAtual < valor) return NextResponse.json({ error: "Saldo insuficiente" }, { status: 400 });
 
