@@ -239,6 +239,7 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
         {/* Meioo footer */}
         <div className="shrink-0 border-t border-border">
           <button
+            id="meioo-sidebar-btn"
             onClick={() => { setFlyoutItem(null); onAbrirMeioo?.(); }}
             className="w-full flex items-center justify-center py-3 hover:bg-bg transition-colors group"
             title="Meioo — Conta Digital Avante"

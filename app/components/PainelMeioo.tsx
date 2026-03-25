@@ -46,7 +46,7 @@ const M = {
 interface PainelMeiooProps {
   aberto: boolean;
   onFechar: () => void;
-  onAbrirCobranca: (tipo: "pix" | "boleto" | "link") => void;
+  onAbrirCobranca: (tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") => void;
 }
 
 const transacoes = [
@@ -68,9 +68,9 @@ const transacoes = [
 
 const acoes = [
   { icon: QrCode,         label: "Pix",    tipo: "pix" as const },
-  { icon: CreditCard,     label: "Cartão", tipo: null },
-  { icon: DollarSign,     label: "Pagar",  tipo: null },
-  { icon: MoreHorizontal, label: "Mais",   tipo: null },
+  { icon: CreditCard,     label: "Cartão", tipo: "cartao" as const },
+  { icon: DollarSign,     label: "Pagar",  tipo: "pagar" as const },
+  { icon: MoreHorizontal, label: "Mais",   tipo: "menu" as const },
 ];
 
 export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooProps) {
@@ -211,9 +211,7 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
             {acoes.map(({ icon: Icon, label, tipo }) => (
               <button
                 key={label}
-                onClick={() => {
-                  if (tipo) { onFechar(); onAbrirCobranca(tipo); }
-                }}
+                onClick={() => { onFechar(); onAbrirCobranca(tipo); }}
                 style={{
                   display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
                   background: "transparent", border: "none", cursor: tipo ? "pointer" : "default",
@@ -227,8 +225,8 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
                     display: "flex", alignItems: "center", justifyContent: "center",
                     transition: "background 150ms",
                   }}
-                  onMouseEnter={e => { if (tipo) e.currentTarget.style.background = "#2a2e35"; }}
-                  onMouseLeave={e => { if (tipo) e.currentTarget.style.background = M.darkCard; }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "#2a2e35")}
+                  onMouseLeave={e => (e.currentTarget.style.background = M.darkCard)}
                 >
                   <Icon size={15} color={M.white} />
                 </div>

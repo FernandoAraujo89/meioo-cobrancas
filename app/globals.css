@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "intro.js/minified/introjs.min.css";
 
 @theme {
   /* Avante Brand Colors */
@@ -44,3 +45,119 @@ body {
 ::-webkit-scrollbar-track { background: #edf2f7; }
 ::-webkit-scrollbar-thumb { background: #d0d5dc; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #95a7b5; }
+
+/* ── Intro.js — Avante Web custom theme ─────────────────────────────────── */
+.avante-tooltip.introjs-tooltip {
+  font-family: "Inter", system-ui, sans-serif;
+  background: #ffffff;
+  border: 1px solid #e4e8eb;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(40, 46, 63, 0.14);
+  padding: 20px 22px 16px;
+  max-width: 320px;
+  min-width: 260px;
+}
+
+.avante-tooltip .introjs-tooltip-title {
+  display: none;
+}
+
+.avante-tooltip .introjs-tooltiptext {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #282e3f;
+  padding: 0;
+}
+
+.avante-tooltip .introjs-tooltiptext strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #282e3f;
+}
+
+.avante-tooltip .introjs-tooltipbuttons {
+  border-top: 1px solid #e4e8eb;
+  padding: 10px 0 0;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avante-tooltip .introjs-button {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.avante-tooltip .introjs-nextbutton {
+  background: #2c6eff;
+  color: #ffffff;
+  margin-left: auto;
+}
+.avante-tooltip .introjs-nextbutton:hover {
+  background: #1a5ce6;
+  color: #ffffff;
+}
+
+.avante-tooltip .introjs-prevbutton {
+  background: #edf2f7;
+  color: #282e3f;
+  border: 1px solid #e4e8eb;
+}
+.avante-tooltip .introjs-prevbutton:hover {
+  background: #e4e8eb;
+}
+
+.avante-tooltip .introjs-skipbutton {
+  font-size: 11px;
+  color: #95a7b5;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-family: "Inter", system-ui, sans-serif;
+}
+.avante-tooltip .introjs-skipbutton:hover {
+  color: #282e3f;
+}
+
+.avante-tooltip .introjs-bullets {
+  padding: 8px 0 0;
+  text-align: left;
+}
+.avante-tooltip .introjs-bullets ul {
+  padding: 0;
+  margin: 0;
+}
+.avante-tooltip .introjs-bullets ul li a {
+  background: #e4e8eb;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  transition: background 150ms, width 150ms;
+}
+.avante-tooltip .introjs-bullets ul li a.active,
+.avante-tooltip .introjs-bullets ul li a:hover {
+  background: #2c6eff;
+  width: 14px;
+}
+
+/* Highlight ring */
+.introjs-helperLayer {
+  border-radius: 10px;
+  border: 2px solid #2c6eff !important;
+  box-shadow: 0 0 0 4px rgba(44, 110, 255, 0.12), rgba(33, 33, 33, 0.5) 0px 0px 1px 0px, rgba(33, 33, 33, 0.3) 0px 0px 0px 5000px !important;
+}
+
+.introjs-arrow.top { border-bottom-color: #ffffff; }
+.introjs-arrow.bottom { border-top-color: #ffffff; }
+.introjs-arrow.left { border-right-color: #ffffff; }
+.introjs-arrow.right { border-left-color: #ffffff; }

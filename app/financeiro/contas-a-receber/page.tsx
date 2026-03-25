@@ -7,6 +7,7 @@ import { ContasReceberTable } from "@/app/components/cobranca/ContasReceberTable
 import { PainelCobranca } from "@/app/components/cobranca/PainelCobranca";
 import { PainelMeioo } from "@/app/components/PainelMeioo";
 import { MeiooIcon } from "@/app/components/MeiooIcon";
+import { MeiooOnboarding } from "@/app/components/MeiooOnboarding";
 import {
   Plus,
   Filter,
@@ -16,7 +17,7 @@ import {
   Download,
 } from "lucide-react";
 
-type TipoFluxo = "menu" | "pix" | "boleto" | "link";
+type TipoFluxo = "menu" | "pix" | "boleto" | "link" | "cartao" | "pagar";
 
 const tabs = [
   { label: "Em aberto", count: 5, active: false },
@@ -42,7 +43,7 @@ export default function ContasAReceberPage() {
     setTimeout(() => setFluxo("menu"), 300);
   }
 
-  function abrirCobrancaDoMeioo(tipo: "pix" | "boleto" | "link") {
+  function abrirCobrancaDoMeioo(tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") {
     setFluxo(tipo);
     setPainelAberto(true);
   }
@@ -86,6 +87,7 @@ export default function ContasAReceberPage() {
                   <RefreshCw size={13} className="text-muted" />
                 </button>
                 <button
+                  id="btn-incluir-cobranca"
                   onClick={() => abrirPainel("menu")}
                   className="h-8 px-4 flex items-center gap-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors shadow-sm"
                 >
@@ -132,7 +134,7 @@ export default function ContasAReceberPage() {
             </div>
 
             {/* Summary cards */}
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div id="summary-cards" className="grid grid-cols-3 gap-3 mb-5">
               {[
                 {
                   label: "Total a Receber",
@@ -188,7 +190,9 @@ export default function ContasAReceberPage() {
             </div>
 
             {/* Table */}
-            <ContasReceberTable />
+            <div id="cobrancas-table">
+              <ContasReceberTable />
+            </div>
 
             {/* Meioo attribution */}
             <div className="flex items-center gap-2 mt-4 text-[11px] text-muted">
@@ -215,6 +219,8 @@ export default function ContasAReceberPage() {
         onFechar={() => setPainelMeiooAberto(false)}
         onAbrirCobranca={abrirCobrancaDoMeioo}
       />
+
+      <MeiooOnboarding />
     </div>
   );
 }

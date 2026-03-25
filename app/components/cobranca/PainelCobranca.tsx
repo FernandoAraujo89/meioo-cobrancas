@@ -6,8 +6,10 @@ import { MeiooIcon } from "../MeiooIcon";
 import { FluxoPix } from "./FluxoPix";
 import { FluxoBoleto } from "./FluxoBoleto";
 import { FluxoLink } from "./FluxoLink";
+import { FluxoCartao } from "./FluxoCartao";
+import { FluxoPagar } from "./FluxoPagar";
 
-type TipoFluxo = "menu" | "pix" | "boleto" | "link";
+type TipoFluxo = "menu" | "pix" | "boleto" | "link" | "cartao" | "pagar";
 
 interface PainelCobrancaProps {
   aberto: boolean;
@@ -75,9 +77,10 @@ export function PainelCobranca({
         <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
           <div className="flex items-center gap-2">
             <h2 className="font-semibold text-dark text-sm">
-              {fluxo === "menu" ? "Incluir cobrança" : ""}
+              {fluxo === "menu" ? "Incluir cobrança" :
+               fluxo === "pagar" ? "Pagar via Pix" : ""}
             </h2>
-            {fluxo === "menu" && <MeiooIcon size={16} variant="badge" />}
+            {(fluxo === "menu" || fluxo === "pagar") && <MeiooIcon size={16} variant="badge" />}
           </div>
           <button
             onClick={onFechar}
@@ -149,17 +152,11 @@ export function PainelCobranca({
             </div>
           )}
 
-          {fluxo === "pix" && (
-            <FluxoPix onVoltar={() => onFluxo("menu")} />
-          )}
-
-          {fluxo === "boleto" && (
-            <FluxoBoleto onVoltar={() => onFluxo("menu")} />
-          )}
-
-          {fluxo === "link" && (
-            <FluxoLink onVoltar={() => onFluxo("menu")} />
-          )}
+          {fluxo === "pix" && <FluxoPix onVoltar={() => onFluxo("menu")} />}
+          {fluxo === "boleto" && <FluxoBoleto onVoltar={() => onFluxo("menu")} />}
+          {fluxo === "link" && <FluxoLink onVoltar={() => onFluxo("menu")} />}
+          {fluxo === "cartao" && <FluxoCartao onVoltar={() => onFluxo("menu")} />}
+          {fluxo === "pagar" && <FluxoPagar onVoltar={() => onFluxo("menu")} />}
         </div>
       </div>
     </>
