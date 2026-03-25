@@ -222,6 +222,7 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
             return (
               <button
                 key={item.label}
+                id={item.label === "Financeiro" ? "financeiro-nav-btn" : undefined}
                 onClick={() => handleIconClick(item)}
                 className={`w-full flex items-center justify-center py-3 transition-colors hover:bg-bg relative
                   ${item.active || isOpen ? "text-primary" : "text-muted hover:text-dark"}`}
@@ -289,41 +290,57 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
 
             {/* Sub-items — scrollable */}
             <nav className="flex-1 overflow-y-auto py-2">
-              {flyoutItem.children.map((child) => {
-                if (child.label === "divider") {
-                  return <div key="divider" className="mx-4 my-2 border-b border-border" />;
-                }
-                return (
-                <button
-                  key={child.label}
-                  onClick={() => {
-                    if (child.href) {
-                      setFlyoutItem(null);
-                      router.push(child.href);
-                    }
-                  }}
-                  className={`w-full flex items-center gap-2 px-5 py-3 text-sm transition-colors hover:bg-bg text-left
-                    ${child.active ? "text-primary font-semibold" : "text-dark/70 hover:text-dark"}
-                    ${child.href ? "cursor-pointer" : ""}`}
-                >
-                  {child.meioo && (
-                    <span
-                      className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
-                      style={{ width: 14, height: 10 }}
-                      title="Meioo"
+              {(() => {
+                const regularItems = flyoutItem.children.filter(c => c.label !== "divider" && !c.meioo);
+                const meiooItems  = flyoutItem.children.filter(c => c.meioo);
+
+                function renderBtn(child: NavChild) {
+                  return (
+                    <button
+                      key={child.label}
+                      onClick={() => {
+                        if (child.href) {
+                          setFlyoutItem(null);
+                          router.push(child.href);
+                        }
+                      }}
+                      className={`w-full flex items-center gap-2 px-5 py-3 text-sm transition-colors hover:bg-bg text-left
+                        ${child.active ? "text-primary font-semibold" : "text-dark/70 hover:text-dark"}
+                        ${child.href ? "cursor-pointer" : ""}`}
                     >
-                      <svg viewBox={MEIOO_ICON_VB} width={10} height={7} fill="none" aria-hidden>
-                        <path d={MEIOO_ICON_PATH} fill="white" />
-                      </svg>
-                    </span>
-                  )}
-                  <span className="flex-1">{child.label}</span>
-                  {child.hasChildren && (
-                    <ChevronRight size={14} className="text-muted shrink-0" />
-                  )}
-                </button>
+                      {child.meioo && (
+                        <span
+                          className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
+                          style={{ width: 14, height: 10 }}
+                          title="Meioo"
+                        >
+                          <svg viewBox={MEIOO_ICON_VB} width={10} height={7} fill="none" aria-hidden>
+                            <path d={MEIOO_ICON_PATH} fill="white" />
+                          </svg>
+                        </span>
+                      )}
+                      <span className="flex-1">{child.label}</span>
+                      {child.hasChildren && (
+                        <ChevronRight size={14} className="text-muted shrink-0" />
+                      )}
+                    </button>
+                  );
+                }
+
+                return (
+                  <>
+                    {regularItems.map(renderBtn)}
+                    {meiooItems.length > 0 && (
+                      <>
+                        <div className="mx-4 my-2 border-b border-border" />
+                        <div id="meioo-flyout-items">
+                          {meiooItems.map(renderBtn)}
+                        </div>
+                      </>
+                    )}
+                  </>
                 );
-              })}
+              })()}
             </nav>
           </div>
         </>

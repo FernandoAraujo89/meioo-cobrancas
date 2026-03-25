@@ -9,7 +9,19 @@ const steps: any[] = [
   {
     element: "#meioo-sidebar-btn",
     intro:
-      "<strong>Bem-vindo à integração Meioo!</strong><br/><br/>Aqui você acessa sua Conta Digital diretamente do Avante Web — saldo, transações e muito mais.",
+      "<strong>Bem-vindo à integração Meioo!</strong><br/><br/>Acesse sua Conta Digital diretamente do Avante Web — saldo, transações e cobranças em um só lugar.",
+    position: "right",
+  },
+  {
+    element: "#financeiro-nav-btn",
+    intro:
+      "<strong>Menu Financeiro.</strong><br/><br/>Clique aqui para expandir o módulo financeiro e acessar as funcionalidades integradas à Meioo.",
+    position: "right",
+  },
+  {
+    element: "#meioo-flyout-items",
+    intro:
+      "<strong>Ações bancárias Meioo.</strong><br/><br/>Aqui estão os menus integrados à sua Conta Digital: <b>Contas a Receber</b>, <b>Contas a Pagar</b> e <b>Cobranças Bancárias</b> — todos conectados automaticamente.",
     position: "right",
   },
   {
@@ -32,6 +44,16 @@ const steps: any[] = [
   },
 ];
 
+function openFinanceiroFlyout() {
+  const btn = document.getElementById("financeiro-nav-btn") as HTMLButtonElement | null;
+  btn?.click();
+}
+
+function closeFinanceiroFlyout() {
+  const backdrop = document.querySelector(".fixed.inset-0.z-10") as HTMLElement | null;
+  backdrop?.click();
+}
+
 export function useMeiooTour() {
   const startTour = useCallback(async () => {
     const introjs = (await import("intro.js")).default;
@@ -52,10 +74,25 @@ export function useMeiooTour() {
       scrollPadding: 80,
     });
 
+    // Step index 2 = #meioo-flyout-items (flyout must be open for the element to exist in DOM)
+    const FLYOUT_STEP = 2;
+
+    tour.onbeforechange((_target: Element, stepIndex: number): Promise<boolean> => {
+      if (stepIndex === FLYOUT_STEP) {
+        openFinanceiroFlyout();
+        // Wait for React to render the flyout into the DOM
+        return new Promise((r) => setTimeout(() => r(true), 400));
+      }
+      closeFinanceiroFlyout();
+      return Promise.resolve(true);
+    });
+
     tour.oncomplete(() => {
+      closeFinanceiroFlyout();
       localStorage.setItem(STORAGE_KEY, "1");
     });
     tour.onexit(() => {
+      closeFinanceiroFlyout();
       localStorage.setItem(STORAGE_KEY, "1");
     });
 
@@ -72,7 +109,6 @@ export function MeiooOnboarding() {
     const alreadySeen = localStorage.getItem(STORAGE_KEY);
     if (alreadySeen) return;
 
-    // Small delay to let the page fully render before highlighting elements
     const timer = setTimeout(() => {
       startTour();
     }, 800);
