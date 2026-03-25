@@ -7,7 +7,6 @@ import { ContasReceberTable } from "@/app/components/cobranca/ContasReceberTable
 import { PainelCobranca } from "@/app/components/cobranca/PainelCobranca";
 import { PainelMeioo } from "@/app/components/PainelMeioo";
 import { MeiooIcon } from "@/app/components/MeiooIcon";
-import { MeiooOnboarding } from "@/app/components/MeiooOnboarding";
 import {
   Plus,
   Filter,
@@ -220,7 +219,6 @@ export default function ContasAReceberPage() {
         onAbrirCobranca={abrirCobrancaDoMeioo}
       />
 
-      <MeiooOnboarding />
     </div>
   );
 }
