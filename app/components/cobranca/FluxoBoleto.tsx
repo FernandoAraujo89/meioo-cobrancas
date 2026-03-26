@@ -206,7 +206,7 @@ export function FluxoBoleto({ onVoltar }: FluxoBoletoProps) {
           </label>
           <div className="flex items-center gap-2 px-3 h-9 rounded-lg border border-border bg-white">
             <MeiooIcon size={14} variant="badge" />
-            <span className="text-xs text-dark font-medium">Olist Conta Do</span>
+            <span className="text-xs text-dark font-medium">Conta Meioo</span>
           </div>
         </div>
 
