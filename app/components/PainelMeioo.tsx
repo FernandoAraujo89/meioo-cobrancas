@@ -14,7 +14,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
 } from "lucide-react";
-import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
+import { MEIOO_ICON_BG_PATH, MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
 /* ─── Meioo Design Tokens (from Figma vmGGJxD54dhMFVXMDQKM2S + style SVG) ── */
 const M = {
@@ -47,24 +47,12 @@ interface PainelMeiooProps {
   aberto: boolean;
   onFechar: () => void;
   onAbrirCobranca: (tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") => void;
+  refreshKey?: number;
 }
 
-const transacoes = [
-  {
-    grupo: "HOJE",
-    items: [
-      { nome: "Educa Livros Ltda.",       detalhe: "Pix",  valor: +12500.0,  data: "18 Março", tipo: "entrada" },
-      { nome: "TechAula Equipamentos",    detalhe: "Pix",  valor: +7800.0,   data: "18 Março", tipo: "entrada" },
-    ],
-  },
-  {
-    grupo: "ESTA SEMANA",
-    items: [
-      { nome: "Cantina Escolar Sabores",  detalhe: "Pix",  valor: -9200.0,   data: "18 Março", tipo: "saida" },
-      { nome: "Limpeza",                  detalhe: "Pix",  valor: +3450.0,   data: "18 Março", tipo: "entrada" },
-    ],
-  },
-];
+interface Transacao {
+  nome: string; detalhe: string; valor: number; tipo: string; data: string;
+}
 
 const acoes = [
   { icon: QrCode,         label: "Pix",    tipo: "pix" as const },
@@ -76,8 +64,10 @@ const acoes = [
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 640;
 
-export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooProps) {
+export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0 }: PainelMeiooProps) {
   const [saldoVisivel, setSaldoVisivel] = useState(true);
+  const [saldo, setSaldo] = useState<number | null>(null);
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [panelWidth, setPanelWidth] = useState(320);
   const [isDesktop, setIsDesktop] = useState(false);
   const isResizing = useRef(false);
@@ -88,6 +78,17 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
   useEffect(() => {
     setIsDesktop(window.matchMedia("(pointer: fine)").matches);
   }, []);
+
+  // Fetch saldo + transacoes da API sempre que abrir ou refreshKey mudar
+  useEffect(() => {
+    if (!aberto) return;
+    fetch("/api/saldo")
+      .then(r => r.json())
+      .then(d => {
+        setSaldo(d.saldo);
+        setTransacoes(d.transacoes);
+      });
+  }, [aberto, refreshKey]);
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onFechar(); };
@@ -166,20 +167,14 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
 
           {/* Top bar: Meioo logo + close */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: M.sp24 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: M.sp8 }}>
-              <div style={{
-                width: 28, height: 20, borderRadius: 4,
-                background: M.primary,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <svg viewBox={MEIOO_ICON_VB} width={21} height={15} fill="none" aria-hidden>
-                  <path d={MEIOO_ICON_PATH} fill={M.black} />
-                </svg>
-              </div>
-              <span style={{ color: M.white, fontWeight: 700, fontSize: 15, letterSpacing: -0.3 }}>
-                Meioo
-              </span>
-            </div>
+            {/* Logo Meioo completa */}
+            <svg width="78" height="12" viewBox="0 0 104 16" fill="none" aria-label="Meioo">
+              <path d="M84.094 0.0581567C84.7342 0.00155687 85.9335 0.0365857 86.6209 0.0367007L91.3352 0.0380822L98.4689 0.0372186C99.7958 0.0348602 101.117 0.0277857 102.449 0.0365287C103.062 0.0405551 103.535 0.210068 103.852 0.786592C103.942 1.00942 103.997 1.35731 103.996 1.59003C103.993 5.58993 103.995 9.58994 104 13.5897C104.001 14.4146 103.678 14.7792 102.955 15.1039C102.217 15.1608 101.138 15.1283 100.368 15.1282L95.774 15.127L88.6036 15.1292C87.2789 15.1314 85.9415 15.1423 84.6249 15.1227C83.004 15.1087 83.054 13.8918 83.0627 12.6489C83.0868 8.95756 83.0523 5.26954 83.0684 1.5791C83.0719 0.765711 83.3733 0.377624 84.094 0.0581567ZM86.1486 12.4186L100.944 12.4226L100.949 2.73388L91.7131 2.72502C89.9363 2.72525 87.9059 2.67803 86.1457 2.74095L86.1486 12.4186Z" fill="white"/>
+              <path d="M60.9881 0.0508032C63.8906 -0.0559541 67.3884 0.038552 70.33 0.0394723L75.7817 0.0364232C76.8263 0.0333746 77.864 0.0264735 78.9143 0.0348715C79.5194 0.0397031 80.0101 0.243612 80.3069 0.807367C80.392 0.968481 80.4305 1.44337 80.4311 1.63525C80.4426 4.22337 80.4374 6.81264 80.4259 9.40082C80.4023 10.8014 80.4742 12.2073 80.4432 13.607C80.4253 14.4043 80.0722 14.8209 79.371 15.1069C78.4547 15.1584 77.2917 15.128 76.3535 15.1279L71.0944 15.1261L65.0134 15.1287C63.8417 15.1315 62.6821 15.1389 61.5001 15.1259C60.8932 15.1192 60.36 14.9606 60.0592 14.3557C59.9729 14.1184 59.9171 13.7728 59.9177 13.5273C59.92 9.53679 59.9142 5.54582 59.9188 1.55553C59.9194 0.737364 60.2329 0.324657 60.9881 0.0508032ZM62.9835 12.4187L77.3762 12.4226L77.3843 2.7336L68.3749 2.72509C66.6366 2.72538 64.708 2.68482 62.9824 2.73809L62.9835 12.4187Z" fill="white"/>
+              <path d="M29.0035 0.0407861C35.7985 -0.0333574 42.7297 0.0383115 49.5359 0.0388867C49.5495 0.923662 49.539 1.83593 49.5401 2.72301C43.794 2.85525 37.7754 2.58594 32.0307 2.74141L32.0319 6.32083L48.1112 6.32503C48.1324 7.17731 48.1162 8.07934 48.113 8.93593L42.0761 8.93818C38.7714 8.93703 35.3249 8.88756 32.0316 8.95106L32.0323 12.4185C37.8054 12.4906 43.7492 12.423 49.536 12.424C49.5493 13.3152 49.5388 14.2332 49.5396 15.1267L29.0016 15.1247L29.0035 0.0407861Z" fill="white"/>
+              <path d="M22.0519 0.0374403L25.0061 0.0387639C25.0593 5.02306 25.0082 10.1333 25.0082 15.1261L21.9084 15.1242L21.9063 10.5428L21.9082 5.12769L13.7826 15.1268L11.1305 15.1291C10.2809 14.0134 9.2864 12.8266 8.40289 11.7263L3.11333 5.1389C3.05869 8.41807 3.10781 11.8352 3.10661 15.1253L0.00074779 15.1238L0 0.0412372C0.955295 0.0220254 1.9715 0.0399131 2.93174 0.0400857C3.92638 1.21839 5.0356 2.7123 5.99987 3.94053L12.4866 12.1893L22.0519 0.0374403Z" fill="white"/>
+              <path d="M53.0912 0.0414954C54.0989 0.0209032 55.1723 0.0393668 56.1858 0.0389641L56.184 15.1241C55.1665 15.1395 54.1127 15.125 53.0923 15.1248L53.0912 0.0414954Z" fill="white"/>
+            </svg>
 
             <button
               onClick={onFechar}
@@ -216,7 +211,11 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
               color: M.white, fontSize: 32, fontWeight: 800,
               letterSpacing: -1.5, lineHeight: 1,
             }}>
-              {saldoVisivel ? "R$12.650,00" : "R$ ••••••"}
+              {saldoVisivel
+                ? saldo !== null
+                  ? `R$${saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                  : "Carregando..."
+                : "R$ ••••••"}
             </div>
           </div>
 
@@ -246,8 +245,9 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
                 display: "flex", alignItems: "flex-end", justifyContent: "flex-start",
                 padding: 5,
               }}>
-                <svg viewBox={MEIOO_ICON_VB} width={14} height={10} fill="none" aria-hidden>
-                  <path d={MEIOO_ICON_PATH} fill={M.black} />
+                <svg viewBox={MEIOO_ICON_VB} width={14} height={14} fill="none" aria-hidden>
+                  <path d={MEIOO_ICON_BG_PATH} fill={M.black} />
+                  <path d={MEIOO_ICON_PATH} fill="white" />
                 </svg>
               </div>
               {/* Gray card */}
@@ -310,7 +310,12 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
           </p>
 
           {/* Grouped transactions */}
-          {transacoes.map((grupo) => (
+          {transacoes.length === 0 && (
+            <p style={{ color: M.lightSub, fontSize: 12, textAlign: "center", padding: "20px 0" }}>
+              Nenhuma transação ainda.
+            </p>
+          )}
+          {transacoes.length > 0 && [{ grupo: "RECENTES", items: transacoes }].map((grupo) => (
             <div key={grupo.grupo} style={{ marginBottom: M.sp20 }}>
               <div style={{
                 color: M.lightSub, fontSize: 10, fontWeight: 600,
@@ -406,8 +411,9 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca }: PainelMeiooPr
             background: M.primary,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <svg viewBox={MEIOO_ICON_VB} width={14} height={10} fill="none" aria-hidden>
-              <path d={MEIOO_ICON_PATH} fill={M.black} />
+            <svg viewBox={MEIOO_ICON_VB} width={14} height={14} fill="none" aria-hidden>
+              <path d={MEIOO_ICON_BG_PATH} fill={M.black} />
+              <path d={MEIOO_ICON_PATH} fill="white" />
             </svg>
           </div>
           <span style={{ color: M.lightSub, fontSize: 10 }}>

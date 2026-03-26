@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 
-const STORAGE_KEY = "meioo_tour_done";
+const STORAGE_KEY = "meioo_tour_v3";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const steps: any[] = [
@@ -109,11 +109,20 @@ export function MeiooOnboarding() {
     const alreadySeen = localStorage.getItem(STORAGE_KEY);
     if (alreadySeen) return;
 
-    const timer = setTimeout(() => {
-      startTour();
-    }, 800);
+    // Polling: aguarda o sidebar estar no DOM (até 8s, verifica a cada 500ms)
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      const hasSidebar = !!document.getElementById("financeiro-nav-btn");
+      if (hasSidebar) {
+        clearInterval(interval);
+        startTour();
+      } else if (attempts >= 16) {
+        clearInterval(interval); // desiste após 8s
+      }
+    }, 500);
 
-    return () => clearTimeout(timer);
+    return () => clearInterval(interval);
   }, [startTour]);
 
   return null;
