@@ -1,11 +1,11 @@
 "use client";
 
-// Meioo logo path — frame/hollow-rect shape, viewBox 0 0 120 120
-const PATH =
-  "M87.8292 36.3711C90.1313 36.3711 91.9975 38.2196 91.9975 40.4999V78.5976C91.9975 80.8779 90.1313 82.7264 87.8292 82.7264H32.6946C30.3926 82.7264 28.5264 80.8779 28.5264 78.5976V40.4999C28.5264 38.2196 30.3926 36.3711 32.6946 36.3711H87.8292ZM38.1891 44.6287V74.2811H82.3347V44.6287H38.1891Z";
-
-// Tight viewBox around the icon shape (with small padding)
-const VB = "20 28 80 62";
+// New Meioo icon — square 59.02×59.02 with rounded-corner bg path
+const BG_PATH =
+  "M46.92,59.02H12.1c-6.68,0-12.1-5.42-12.1-12.1V12.1C0,5.42,5.42,0,12.1,0h34.82c6.68,0,12.1,5.42,12.1,12.1v34.82c0,6.68-5.42,12.1-12.1,12.1";
+const INNER_PATH =
+  "M14.28,18.77v21.91c0,.47.38.85.85.85h30.43c.47,0,.85-.38.85-.85v-21.91c0-.47-.38-.85-.85-.85H15.13c-.47,0-.85.38-.85.85M42.19,37.7h-23.68v-15.95h23.68v15.95Z";
+const VB = "0 0 59.02 59.02";
 
 interface MeiooIconProps {
   size?: number;
@@ -14,27 +14,10 @@ interface MeiooIconProps {
 }
 
 export function MeiooIcon({ size = 16, className = "", variant = "default" }: MeiooIconProps) {
-  if (variant === "badge") {
-    // Rectangular dark badge — same proportions as before, SVG icon inside
-    const w = size;
-    const h = Math.round(size * 0.72);
-    return (
-      <span
-        className={`inline-flex items-center justify-center rounded-[3px] bg-dark select-none shrink-0 ${className}`}
-        style={{ width: w, height: h }}
-        title="Meioo"
-      >
-        <svg viewBox={VB} width={w * 0.78} height={h * 0.78} fill="none" aria-hidden>
-          <path d={PATH} fill="white" />
-        </svg>
-      </span>
-    );
-  }
-
-  // Default: full circular icon (as in original SVG file)
+  // The new icon is self-contained: outer path = dark rounded-rect bg, inner path = white icon
   return (
     <svg
-      viewBox="0 0 120 120"
+      viewBox={VB}
       width={size}
       height={size}
       fill="none"
@@ -42,12 +25,13 @@ export function MeiooIcon({ size = 16, className = "", variant = "default" }: Me
       aria-label="Meioo"
       aria-hidden
     >
-      <circle cx="59.9053" cy="59.9053" r="59.9053" fill="#17191E" />
-      <path d={PATH} fill="white" />
+      <path d={BG_PATH} fill="#17191E" />
+      <path d={INNER_PATH} fill="white" />
     </svg>
   );
 }
 
-// Exporta o path e viewBox para uso inline em outros componentes
-export const MEIOO_ICON_PATH = PATH;
+// Exports for inline SVG use in other components
+export const MEIOO_ICON_BG_PATH = BG_PATH;
+export const MEIOO_ICON_PATH = INNER_PATH;
 export const MEIOO_ICON_VB = VB;

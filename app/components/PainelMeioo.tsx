@@ -14,7 +14,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
 } from "lucide-react";
-import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
+import { MEIOO_ICON_BG_PATH, MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
 /* ─── Meioo Design Tokens (from Figma vmGGJxD54dhMFVXMDQKM2S + style SVG) ── */
 const M = {
@@ -245,8 +245,9 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0 
                 display: "flex", alignItems: "flex-end", justifyContent: "flex-start",
                 padding: 5,
               }}>
-                <svg viewBox={MEIOO_ICON_VB} width={14} height={10} fill="none" aria-hidden>
-                  <path d={MEIOO_ICON_PATH} fill={M.black} />
+                <svg viewBox={MEIOO_ICON_VB} width={14} height={14} fill="none" aria-hidden>
+                  <path d={MEIOO_ICON_BG_PATH} fill={M.black} />
+                  <path d={MEIOO_ICON_PATH} fill="white" />
                 </svg>
               </div>
               {/* Gray card */}
@@ -410,8 +411,9 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0 
             background: M.primary,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <svg viewBox={MEIOO_ICON_VB} width={14} height={10} fill="none" aria-hidden>
-              <path d={MEIOO_ICON_PATH} fill={M.black} />
+            <svg viewBox={MEIOO_ICON_VB} width={14} height={14} fill="none" aria-hidden>
+              <path d={MEIOO_ICON_BG_PATH} fill={M.black} />
+              <path d={MEIOO_ICON_PATH} fill="white" />
             </svg>
           </div>
           <span style={{ color: M.lightSub, fontSize: 10 }}>

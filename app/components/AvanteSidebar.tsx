@@ -24,7 +24,7 @@ import {
   CalendarRange,
   Settings,
 } from "lucide-react";
-import { MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
+import { MEIOO_ICON_BG_PATH, MEIOO_ICON_PATH, MEIOO_ICON_VB } from "./MeiooIcon";
 
 interface NavChild {
   label: string;
@@ -245,14 +245,10 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
             className="w-full flex items-center justify-center py-3 hover:bg-bg transition-colors group"
             title="Meioo — Conta Digital Avante"
           >
-            <div
-              className="flex items-center justify-center rounded-[3px] bg-dark group-hover:bg-primary transition-colors shrink-0"
-              style={{ width: 20, height: 14 }}
-            >
-              <svg viewBox={MEIOO_ICON_VB} width={15} height={11} fill="none" aria-hidden>
-                <path d={MEIOO_ICON_PATH} fill="white" />
-              </svg>
-            </div>
+            <svg viewBox={MEIOO_ICON_VB} width={20} height={20} fill="none" aria-hidden className="shrink-0">
+              <path d={MEIOO_ICON_BG_PATH} fill="#17191E" className="group-hover:fill-primary transition-colors" />
+              <path d={MEIOO_ICON_PATH} fill="white" />
+            </svg>
           </button>
         </div>
       </aside>
@@ -309,15 +305,10 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
                         ${child.href ? "cursor-pointer" : ""}`}
                     >
                       {child.meioo && (
-                        <span
-                          className="inline-flex items-center justify-center rounded-[2px] bg-dark shrink-0"
-                          style={{ width: 14, height: 10 }}
-                          title="Meioo"
-                        >
-                          <svg viewBox={MEIOO_ICON_VB} width={10} height={7} fill="none" aria-hidden>
-                            <path d={MEIOO_ICON_PATH} fill="white" />
-                          </svg>
-                        </span>
+                        <svg viewBox={MEIOO_ICON_VB} width={14} height={14} fill="none" aria-hidden className="shrink-0">
+                          <path d={MEIOO_ICON_BG_PATH} fill="#17191E" />
+                          <path d={MEIOO_ICON_PATH} fill="white" />
+                        </svg>
                       )}
                       <span className="flex-1">{child.label}</span>
                       {child.hasChildren && (
