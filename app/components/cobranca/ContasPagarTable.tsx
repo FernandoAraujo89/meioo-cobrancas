@@ -113,102 +113,104 @@ interface ContasPagarTableProps {
 export function ContasPagarTable({ onPagar }: ContasPagarTableProps) {
   return (
     <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-card">
-      <table className="w-full text-xs">
-        <thead>
-          <tr className="border-b border-border bg-bg/50">
-            <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              <input type="checkbox" className="rounded border-border" />
-            </th>
-            <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Fornecedor
-            </th>
-            <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Histórico
-            </th>
-            <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Vencimento
-            </th>
-            <th className="text-right py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Valor
-            </th>
-            <th className="text-right py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Saldo
-            </th>
-            <th className="text-center py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Status
-            </th>
-            <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-              Meio
-            </th>
-            <th className="py-3 px-4" />
-          </tr>
-        </thead>
-        <tbody>
-          {mockData.map((row, idx) => {
-            const st = statusConfig[row.status];
-            const podeAtuar = row.status === "a_pagar" || row.status === "atrasado";
-            return (
-              <tr
-                key={row.id}
-                className={`border-b border-border last:border-0 hover:bg-bg/40 transition-colors ${idx % 2 === 0 ? "" : "bg-bg/20"}`}
-              >
-                <td className="py-3 px-4">
-                  <input type="checkbox" className="rounded border-border" />
-                </td>
-                <td className="py-3 px-4 font-medium text-dark">
-                  {row.fornecedor}
-                </td>
-                <td className="py-3 px-4 text-muted max-w-[200px] truncate">
-                  {row.historico}
-                </td>
-                <td className={`py-3 px-4 font-medium ${row.status === "atrasado" ? "text-danger" : "text-dark"}`}>
-                  {row.vencimento}
-                </td>
-                <td className="py-3 px-4 text-right font-medium text-dark">
-                  {row.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                </td>
-                <td className="py-3 px-4 text-right text-dark">
-                  {row.saldo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${st.className}`}>
-                    {st.label}
-                  </span>
-                </td>
-                <td className="py-3 px-4">
-                  {row.meio ? (
-                    <div className="flex items-center gap-1.5">
-                      <MeiooIcon size={14} variant="badge" className="shrink-0" />
-                      <span className="shrink-0">{meioIcon[row.meio]}</span>
-                      <span className="text-[11px] text-muted">{meioLabel[row.meio]}</span>
-                    </div>
-                  ) : (
-                    <span className="text-muted text-[11px]">—</span>
-                  )}
-                </td>
-                <td className="py-3 px-4">
-                  <div className="flex items-center justify-end gap-1">
-                    {podeAtuar && (
-                      <button
-                        onClick={() => onPagar?.(row.id)}
-                        className="h-6 px-2 rounded text-[10px] font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
-                      >
-                        Pagar
-                      </button>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs min-w-[520px]">
+          <thead>
+            <tr className="border-b border-border bg-bg/50">
+              <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden sm:table-cell">
+                <input type="checkbox" className="rounded border-border" />
+              </th>
+              <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
+                Fornecedor
+              </th>
+              <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden md:table-cell">
+                Histórico
+              </th>
+              <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
+                Vencimento
+              </th>
+              <th className="text-right py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
+                Valor
+              </th>
+              <th className="text-right py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden sm:table-cell">
+                Saldo
+              </th>
+              <th className="text-center py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
+                Status
+              </th>
+              <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
+                Meio
+              </th>
+              <th className="py-3 px-3 sm:px-4" />
+            </tr>
+          </thead>
+          <tbody>
+            {mockData.map((row, idx) => {
+              const st = statusConfig[row.status];
+              const podeAtuar = row.status === "a_pagar" || row.status === "atrasado";
+              return (
+                <tr
+                  key={row.id}
+                  className={`border-b border-border last:border-0 hover:bg-bg/40 transition-colors ${idx % 2 === 0 ? "" : "bg-bg/20"}`}
+                >
+                  <td className="py-3 px-4 hidden sm:table-cell">
+                    <input type="checkbox" className="rounded border-border" />
+                  </td>
+                  <td className="py-3 px-3 sm:px-4 font-medium text-dark">
+                    {row.fornecedor}
+                  </td>
+                  <td className="py-3 px-4 text-muted max-w-[200px] truncate hidden md:table-cell">
+                    {row.historico}
+                  </td>
+                  <td className={`py-3 px-3 sm:px-4 font-medium ${row.status === "atrasado" ? "text-danger" : "text-dark"}`}>
+                    {row.vencimento}
+                  </td>
+                  <td className="py-3 px-3 sm:px-4 text-right font-medium text-dark">
+                    {row.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </td>
+                  <td className="py-3 px-4 text-right text-dark hidden sm:table-cell">
+                    {row.saldo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </td>
+                  <td className="py-3 px-3 sm:px-4 text-center">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${st.className}`}>
+                      {st.label}
+                    </span>
+                  </td>
+                  <td className="py-3 px-3 sm:px-4">
+                    {row.meio ? (
+                      <div className="flex items-center gap-1">
+                        <MeiooIcon size={14} variant="badge" className="shrink-0" />
+                        <span className="shrink-0">{meioIcon[row.meio]}</span>
+                        <span className="text-[11px] text-muted hidden sm:inline">{meioLabel[row.meio]}</span>
+                      </div>
+                    ) : (
+                      <span className="text-muted text-[11px]">—</span>
                     )}
-                    <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark">
-                      <Eye size={13} />
-                    </button>
-                    <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark">
-                      <MoreHorizontal size={13} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  </td>
+                  <td className="py-3 px-3 sm:px-4">
+                    <div className="flex items-center justify-end gap-1">
+                      {podeAtuar && (
+                        <button
+                          onClick={() => onPagar?.(row.id)}
+                          className="h-6 px-2 rounded text-[10px] font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
+                        >
+                          Pagar
+                        </button>
+                      )}
+                      <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark">
+                        <Eye size={13} />
+                      </button>
+                      <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark">
+                        <MoreHorizontal size={13} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

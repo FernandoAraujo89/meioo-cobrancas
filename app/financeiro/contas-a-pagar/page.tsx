@@ -76,7 +76,7 @@ export default function ContasAPagarPage() {
         <AvanteSidebar onAbrirMeioo={() => setPainelMeiooAberto(true)} />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-[11px] text-muted mb-4">
               <span>Início</span>
@@ -87,7 +87,7 @@ export default function ContasAPagarPage() {
             </div>
 
             {/* Page header */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <div>
                 <h1 className="text-xl font-bold text-dark leading-tight">
                   Contas a Pagar
@@ -98,11 +98,11 @@ export default function ContasAPagarPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
+                <button className="h-8 px-3 hidden sm:flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
                   <Download size={13} className="text-muted" />
                   Exportar
                 </button>
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
+                <button className="h-8 px-3 hidden sm:flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
                   <RefreshCw size={13} className="text-muted" />
                 </button>
                 <button
@@ -117,52 +117,53 @@ export default function ContasAPagarPage() {
             </div>
 
             {/* Alerta de vencidos */}
-            <div className="flex items-center gap-3 mb-5 p-3 rounded-lg bg-danger-bg border border-danger/20">
-              <AlertTriangle size={15} className="text-danger shrink-0" />
-              <p className="text-xs text-danger font-medium">
-                Você possui <strong>1 conta atrasada</strong> no valor de <strong>R$ 3.200,00</strong>. Regularize para evitar juros e multas.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-5 p-3 rounded-lg bg-danger-bg border border-danger/20">
+              <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <AlertTriangle size={15} className="text-danger shrink-0 mt-0.5 sm:mt-0" />
+                <p className="text-xs text-danger font-medium">
+                  Você possui <strong>1 conta atrasada</strong> no valor de <strong>R$ 3.200,00</strong>. Regularize para evitar juros e multas.
+                </p>
+              </div>
               <button
                 onClick={handlePagarAgora}
-                className="ml-auto shrink-0 h-6 px-3 rounded-md bg-danger text-white text-[11px] font-semibold hover:bg-danger/90 transition-colors"
+                className="shrink-0 h-7 px-3 rounded-md bg-danger text-white text-[11px] font-semibold hover:bg-danger/90 transition-colors self-start sm:self-auto"
               >
                 Pagar agora
               </button>
             </div>
 
             {/* Filters row */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-2 flex-1">
-                <div className="relative flex-1 max-w-xs">
-                  <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-                    width="13" height="13" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" strokeWidth="2"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <input
-                    placeholder="Pesquisar por fornecedor..."
-                    className="w-full pl-8 pr-3 h-8 rounded-lg border border-border bg-surface text-xs text-dark placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-                  />
-                </div>
-
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
-                  <Calendar size={13} className="text-muted" />
-                  24–31 Agosto
-                  <ChevronDown size={11} className="text-muted" />
-                </button>
-
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
-                  <Filter size={13} className="text-muted" />
-                  Filtros
-                </button>
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <div className="relative flex-1 min-w-[140px] max-w-xs">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                  width="13" height="13" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="2"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  placeholder="Pesquisar por fornecedor..."
+                  className="w-full pl-8 pr-3 h-8 rounded-lg border border-border bg-surface text-xs text-dark placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                />
               </div>
+
+              <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors shrink-0">
+                <Calendar size={13} className="text-muted" />
+                <span className="hidden sm:inline">24–31 Agosto</span>
+                <span className="sm:hidden">Agosto</span>
+                <ChevronDown size={11} className="text-muted" />
+              </button>
+
+              <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors shrink-0">
+                <Filter size={13} className="text-muted" />
+                Filtros
+              </button>
             </div>
 
             {/* Summary cards */}
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               {[
                 {
                   label: "Total a Pagar",
@@ -195,14 +196,14 @@ export default function ContasAPagarPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-0 border-b border-border mb-4">
+            <div className="flex items-center gap-0 border-b border-border mb-4 overflow-x-auto">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.label;
                 return (
                   <button
                     key={tab.label}
                     onClick={() => setActiveTab(tab.label)}
-                    className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px whitespace-nowrap
                       ${isActive ? "border-primary text-primary" : "border-transparent text-muted hover:text-dark"}`}
                   >
                     {tab.label}
@@ -232,9 +233,9 @@ export default function ContasAPagarPage() {
 
       {/* Modal confirmação de pagamento */}
       {showPagarModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => !confirmando && setShowPagarModal(false)} />
-          <div className="relative bg-surface rounded-xl shadow-xl border border-border w-[400px] p-6 z-10">
+          <div className="relative bg-surface rounded-xl shadow-xl border border-border w-full max-w-[400px] p-6 z-10">
 
             {pagoOk ? (
               /* ── Sucesso ── */
@@ -251,7 +252,7 @@ export default function ContasAPagarPage() {
               /* ── Confirmação ── */
               <>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <MeiooIcon size={20} variant="badge" />
                   </div>
                   <div>
@@ -261,22 +262,22 @@ export default function ContasAPagarPage() {
                 </div>
 
                 <div className="bg-bg rounded-lg p-4 mb-4 space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-muted">Fornecedor</span>
-                    <span className="font-medium text-dark">{contaModal.fornecedor}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted shrink-0">Fornecedor</span>
+                    <span className="font-medium text-dark text-right">{contaModal.fornecedor}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted">Vencimento</span>
-                    <span className="font-medium text-danger">{contaModal.vencimento} (atrasado)</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted shrink-0">Vencimento</span>
+                    <span className="font-medium text-danger text-right">{contaModal.vencimento} (atrasado)</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted">Valor</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted shrink-0">Valor</span>
                     <span className="font-bold text-dark">
                       R$ {contaModal.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted">Saldo disponível</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted shrink-0">Saldo disponível</span>
                     <span className="font-medium text-success">
                       R$ {contaModal.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>

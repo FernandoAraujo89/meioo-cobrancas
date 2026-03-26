@@ -50,7 +50,7 @@ export default function ContasAReceberPage() {
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-[11px] text-muted mb-4">
               <span>Início</span>
@@ -61,7 +61,7 @@ export default function ContasAReceberPage() {
             </div>
 
             {/* Page header */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <div>
                 <h1 className="text-xl font-bold text-dark leading-tight">
                   Contas a Receber
@@ -72,11 +72,11 @@ export default function ContasAReceberPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
+                <button className="h-8 px-3 hidden sm:flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
                   <Download size={13} className="text-muted" />
                   Exportar
                 </button>
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
+                <button className="h-8 px-3 hidden sm:flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
                   <RefreshCw size={13} className="text-muted" />
                 </button>
                 <button
@@ -92,42 +92,41 @@ export default function ContasAReceberPage() {
             </div>
 
             {/* Filters row */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-2 flex-1">
-                <div className="relative flex-1 max-w-xs">
-                  <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <input
-                    placeholder="Pesquisar por cliente..."
-                    className="w-full pl-8 pr-3 h-8 rounded-lg border border-border bg-surface text-xs text-dark placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-                  />
-                </div>
-
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
-                  <Calendar size={13} className="text-muted" />
-                  24–31 Agosto
-                  <ChevronDown size={11} className="text-muted" />
-                </button>
-
-                <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors">
-                  <Filter size={13} className="text-muted" />
-                  Filtros
-                </button>
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <div className="relative flex-1 min-w-[140px] max-w-xs">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  placeholder="Pesquisar por cliente..."
+                  className="w-full pl-8 pr-3 h-8 rounded-lg border border-border bg-surface text-xs text-dark placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                />
               </div>
+
+              <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors shrink-0">
+                <Calendar size={13} className="text-muted" />
+                <span className="hidden sm:inline">24–31 Agosto</span>
+                <span className="sm:hidden">Agosto</span>
+                <ChevronDown size={11} className="text-muted" />
+              </button>
+
+              <button className="h-8 px-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-dark hover:bg-bg transition-colors shrink-0">
+                <Filter size={13} className="text-muted" />
+                Filtros
+              </button>
             </div>
 
             {/* Summary cards */}
-            <div id="summary-cards" className="grid grid-cols-3 gap-3 mb-5">
+            <div id="summary-cards" className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               {[
                 {
                   label: "Total a Receber",
@@ -164,7 +163,7 @@ export default function ContasAReceberPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-0 border-b border-border mb-4">
+            <div className="flex items-center gap-0 border-b border-border mb-4 overflow-x-auto">
               {TAB_LABELS.map((label) => {
                 const isActive = activeTab === label;
                 const count = contarPorFiltro(label);
@@ -172,7 +171,7 @@ export default function ContasAReceberPage() {
                   <button
                     key={label}
                     onClick={() => setActiveTab(label)}
-                    className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-xs font-medium border-b-2 transition-colors -mb-px whitespace-nowrap
                       ${isActive ? "border-primary text-primary" : "border-transparent text-muted hover:text-dark"}`}
                   >
                     {label}

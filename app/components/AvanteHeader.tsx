@@ -31,20 +31,20 @@ export function AvanteHeader() {
       </div>
 
       {/* Header content */}
-      <div className="flex-1 flex items-center justify-between px-5">
-        <div className="flex items-center gap-3">
-          <span className="font-semibold text-dark text-sm tracking-tight">Avante Web</span>
-          <div className="relative ml-3">
+      <div className="flex-1 flex items-center justify-between px-3 sm:px-5 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <span className="font-semibold text-dark text-sm tracking-tight hidden sm:block">Avante Web</span>
+          <div className="relative hidden sm:block ml-0 sm:ml-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={14} />
             <input
-              className="w-56 pl-8 pr-3 h-8 rounded bg-bg border border-border text-xs text-dark placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+              className="w-44 sm:w-56 pl-8 pr-3 h-8 rounded bg-bg border border-border text-xs text-dark placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
               placeholder="Buscar..."
             />
           </div>
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleRestartTour}
             title="Reiniciar tour Meioo"
@@ -56,12 +56,12 @@ export function AvanteHeader() {
             <Bell size={16} />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full" />
           </button>
-          <div className="flex items-center gap-2 pl-3 border-l border-border cursor-pointer hover:opacity-80">
-            <div className="w-7 h-7 rounded-full bg-primary/20 text-primary text-xs font-semibold flex items-center justify-center">
+          <div className="flex items-center gap-1.5 sm:gap-2 pl-2 sm:pl-3 border-l border-border cursor-pointer hover:opacity-80">
+            <div className="w-7 h-7 rounded-full bg-primary/20 text-primary text-xs font-semibold flex items-center justify-center shrink-0">
               FA
             </div>
-            <span className="text-xs font-medium text-dark">Fernando</span>
-            <ChevronDown size={12} className="text-muted" />
+            <span className="text-xs font-medium text-dark hidden sm:block">Fernando</span>
+            <ChevronDown size={12} className="text-muted hidden sm:block" />
           </div>
         </div>
       </div>

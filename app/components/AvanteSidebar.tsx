@@ -263,8 +263,8 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
           />
 
           <div
-            className="absolute left-14 top-0 h-full bg-surface border-r border-border z-20 shadow-panel flex flex-col"
-            style={{ width: 280 }}
+            className="fixed left-14 top-14 bottom-0 bg-surface border-r border-border z-20 shadow-panel flex flex-col"
+            style={{ width: "min(280px, calc(100vw - 3.5rem))" }}
           >
             {/* Flyout header */}
             <div className="flex items-center gap-3 px-4 py-4 border-b border-border shrink-0">
