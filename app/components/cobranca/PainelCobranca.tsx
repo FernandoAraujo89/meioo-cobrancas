@@ -114,7 +114,6 @@ export function PainelCobranca({
                           <span className="font-semibold text-sm text-dark">
                             {op.titulo}
                           </span>
-                          <MeiooIcon size={13} variant="badge" />
                         </div>
                         <p className="text-xs text-muted leading-relaxed">
                           {op.descricao}
