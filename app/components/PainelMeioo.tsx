@@ -46,7 +46,7 @@ const M = {
 interface PainelMeiooProps {
   aberto: boolean;
   onFechar: () => void;
-  onAbrirCobranca: (tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") => void;
+  onAbrirCobranca?: (tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") => void;
   refreshKey?: number;
   saldoInicial?: number; // saldo imediato pós-pagamento, evita flash "Carregando..."
 }
@@ -275,7 +275,7 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0,
             {acoes.map(({ icon: Icon, label, tipo }) => (
               <button
                 key={label}
-                onClick={() => { onFechar(); onAbrirCobranca(tipo); }}
+                onClick={() => { onFechar(); onAbrirCobranca?.(tipo); }}
                 style={{
                   display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
                   background: "transparent", border: "none", cursor: tipo ? "pointer" : "default",

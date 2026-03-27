@@ -82,7 +82,10 @@ const navItems: NavItem[] = [
     label: "PDV",
     children: [
       { label: "Caixa", hasChildren: true },
-      { label: "Vendas", hasChildren: true },
+      { label: "Realizar Venda", href: "/pdv/realizar-venda" },
+      { label: "Força de Venda" },
+      { label: "Venda Rápida" },
+      { label: "Consultar Vendas" },
       { label: "Configuração", hasChildren: true },
     ],
   },
