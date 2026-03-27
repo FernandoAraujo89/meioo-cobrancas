@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 
-const STORAGE_KEY = "meioo_tour_v6";
+const STORAGE_KEY = "meioo_tour_v7";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const steps: any[] = [

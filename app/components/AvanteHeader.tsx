@@ -15,7 +15,7 @@ export function AvanteHeader() {
   const { startTour } = useMeiooTour();
 
   function handleRestartTour() {
-    localStorage.removeItem("meioo_tour_v6");
+    localStorage.removeItem("meioo_tour_v7");
     startTour();
   }
 
