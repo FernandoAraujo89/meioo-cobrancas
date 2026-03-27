@@ -1,9 +1,9 @@
 "use client";
 
 import { MeiooIcon } from "../MeiooIcon";
-import { Eye, MoreHorizontal, QrCode, FileText, Link2 } from "lucide-react";
+import { Eye, MoreHorizontal, QrCode, FileText, Link2, Zap } from "lucide-react";
 
-interface Cobranca {
+export interface Cobranca {
   id: string;
   cliente: string;
   historico: string;
@@ -123,12 +123,15 @@ export function contarPorFiltro(filtro: string): number {
 
 interface ContasReceberTableProps {
   filtro?: string;
-  onAcao?: (id: string, tipo: "pix" | "boleto" | "link") => void;
+  onGerarCobranca?: (row: Cobranca) => void;
 }
 
-export function ContasReceberTable({ filtro = "Todos", onAcao }: ContasReceberTableProps) {
+export function ContasReceberTable({ filtro = "Todos", onGerarCobranca }: ContasReceberTableProps) {
   const statuses = filtroParaStatus[filtro] ?? [];
   const rows = statuses.length === 0 ? mockData : mockData.filter(r => statuses.includes(r.status));
+
+  const podeGerar = (status: Cobranca["status"]) =>
+    status === "em_aberto" || status === "vencido";
 
   return (
     <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-card">
@@ -143,27 +146,13 @@ export function ContasReceberTable({ filtro = "Todos", onAcao }: ContasReceberTa
                 <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden sm:table-cell">
                   <input type="checkbox" className="rounded border-border" />
                 </th>
-                <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-                  Cliente
-                </th>
-                <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden md:table-cell">
-                  Histórico
-                </th>
-                <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-                  Vencimento
-                </th>
-                <th className="text-right py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-                  Valor
-                </th>
-                <th className="text-right py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden sm:table-cell">
-                  Saldo
-                </th>
-                <th className="text-center py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-                  Status
-                </th>
-                <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">
-                  Meio
-                </th>
+                <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">Cliente</th>
+                <th className="text-left py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden md:table-cell">Histórico</th>
+                <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">Vencimento</th>
+                <th className="text-right py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">Valor</th>
+                <th className="text-right py-3 px-4 font-semibold text-muted uppercase tracking-wide text-[11px] hidden sm:table-cell">Saldo</th>
+                <th className="text-center py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">Status</th>
+                <th className="text-left py-3 px-3 sm:px-4 font-semibold text-muted uppercase tracking-wide text-[11px]">Meio</th>
                 <th className="py-3 px-3 sm:px-4" />
               </tr>
             </thead>
@@ -178,29 +167,17 @@ export function ContasReceberTable({ filtro = "Todos", onAcao }: ContasReceberTa
                     <td className="py-3 px-4 hidden sm:table-cell">
                       <input type="checkbox" className="rounded border-border" />
                     </td>
-                    <td className="py-3 px-3 sm:px-4 font-medium text-dark">
-                      {row.cliente}
-                    </td>
-                    <td className="py-3 px-4 text-muted max-w-[200px] truncate hidden md:table-cell">
-                      {row.historico}
-                    </td>
+                    <td className="py-3 px-3 sm:px-4 font-medium text-dark">{row.cliente}</td>
+                    <td className="py-3 px-4 text-muted max-w-[200px] truncate hidden md:table-cell">{row.historico}</td>
                     <td className="py-3 px-3 sm:px-4 text-dark">{row.vencimento}</td>
                     <td className="py-3 px-3 sm:px-4 text-right font-medium text-dark">
-                      {row.valor.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {row.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                     </td>
                     <td className="py-3 px-4 text-right text-dark hidden sm:table-cell">
-                      {row.saldo.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {row.saldo.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                     </td>
                     <td className="py-3 px-3 sm:px-4 text-center">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${st.className}`}
-                      >
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${st.className}`}>
                         {st.label}
                       </span>
                     </td>
@@ -217,6 +194,16 @@ export function ContasReceberTable({ filtro = "Todos", onAcao }: ContasReceberTa
                     </td>
                     <td className="py-3 px-3 sm:px-4">
                       <div className="flex items-center justify-end gap-1">
+                        {podeGerar(row.status) && onGerarCobranca && (
+                          <button
+                            onClick={() => onGerarCobranca(row)}
+                            title="Gerar cobrança"
+                            className="h-6 px-2 flex items-center gap-1 rounded bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-[10px] font-semibold"
+                          >
+                            <Zap size={11} />
+                            <span className="hidden sm:inline">Cobrar</span>
+                          </button>
+                        )}
                         <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-bg text-muted hover:text-dark">
                           <Eye size={13} />
                         </button>

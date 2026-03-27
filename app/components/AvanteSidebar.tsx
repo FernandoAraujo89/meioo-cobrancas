@@ -129,7 +129,7 @@ const navItems: NavItem[] = [
       { label: "divider" },
       { label: "Contas a Receber", active: true, meioo: true, href: "/financeiro/contas-a-receber" },
       { label: "Contas a Pagar", meioo: true, href: "/financeiro/contas-a-pagar" },
-      { label: "Cobranças Bancárias", meioo: true, hasChildren: true },
+      { label: "Cobranças Bancárias", meioo: true, href: "/financeiro/cobrancas-bancarias" },
     ],
   },
   {
