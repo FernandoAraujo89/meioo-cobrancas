@@ -41,6 +41,7 @@ export default function ContasAPagarPage() {
   const [contaModal, setContaModal] = useState<ContaModal | null>(null);
   const [confirmando, setConfirmando] = useState(false);
   const [pagoOk, setPagoOk] = useState(false);
+  const [erroModal, setErroModal] = useState<string | null>(null);
 
   // Busca saldo Meioo ao montar para exibir no modal
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function ContasAPagarPage() {
     setContaModal(conta);
     setShowPagarModal(true);
     setPagoOk(false);
+    setErroModal(null);
     setNovoSaldo(undefined);
   }
 
@@ -82,15 +84,20 @@ export default function ContasAPagarPage() {
     setConfirmando(false);
 
     if (res.ok) {
-      setNovoSaldo(data.novoSaldo);      // saldo pós-pagamento imediato
-      setSaldoMeioo(data.novoSaldo);     // atualiza saldo local para próximos modais
+      setErroModal(null);
+      setNovoSaldo(data.novoSaldo);
+      setSaldoMeioo(data.novoSaldo);
       setPagoOk(true);
       setTimeout(() => {
         setShowPagarModal(false);
         setPagoOk(false);
-        setRefreshKey(k => k + 1);       // força re-fetch no painel
-        setPainelMeiooAberto(true);      // abre painel com saldo atualizado
+        setRefreshKey(k => k + 1);
+        setPainelMeiooAberto(true);
       }, 1800);
+    } else {
+      // Exibe o erro da API no modal (conta já paga, saldo insuficiente, etc.)
+      const msg = data?.error ?? "Erro ao processar pagamento. Tente novamente.";
+      setErroModal(msg === "Conta já paga" ? "Esta conta já foi paga." : msg);
     }
   }
 
@@ -311,6 +318,12 @@ export default function ContasAPagarPage() {
                 <p className="text-[11px] text-muted mb-4">
                   O valor será debitado da sua Conta Digital Meioo. Esta operação não pode ser desfeita.
                 </p>
+
+                {erroModal && (
+                  <div className="mb-4 px-3 py-2 rounded-lg bg-danger-bg border border-danger/20 text-[11px] text-danger font-medium">
+                    {erroModal}
+                  </div>
+                )}
 
                 <div className="flex gap-2">
                   <button
