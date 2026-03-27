@@ -322,12 +322,15 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
                   <>
                     {regularItems.map(renderBtn)}
                     {meiooItems.length > 0 && (
-                      <>
-                        <div className="mx-4 my-2 border-b border-border" />
+                      <div id="meioo-flyout-section" className="mt-1">
+                        <div className="mx-4 mb-1 border-b border-border" />
+                        <p className="px-5 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted select-none">
+                          Conta Digital Meioo
+                        </p>
                         <div id="meioo-flyout-items">
                           {meiooItems.map(renderBtn)}
                         </div>
-                      </>
+                      </div>
                     )}
                   </>
                 );

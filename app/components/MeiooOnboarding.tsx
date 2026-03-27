@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 
-const STORAGE_KEY = "meioo_tour_v4";
+const STORAGE_KEY = "meioo_tour_v5";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const steps: any[] = [
@@ -19,9 +19,9 @@ const steps: any[] = [
     position: "right",
   },
   {
-    element: "#meioo-flyout-items",
+    element: "#meioo-flyout-section",
     intro:
-      "<strong>Ações bancárias Meioo.</strong><br/><br/>Aqui estão os menus integrados à sua Conta Digital: <b>Contas a Receber</b>, <b>Contas a Pagar</b> e <b>Cobranças Bancárias</b> — todos conectados automaticamente.",
+      "<strong>Conta Digital Meioo no Financeiro.</strong><br/><br/>Os menus <b>Contas a Receber</b>, <b>Contas a Pagar</b> e <b>Cobranças Bancárias</b> estão integrados diretamente à sua Conta Digital Meioo — gerencie tudo sem sair do Avante Web.",
     position: "right",
   },
   {
@@ -74,15 +74,22 @@ export function useMeiooTour() {
       scrollPadding: 80,
     });
 
-    // Step index 2 = #meioo-flyout-items (flyout must be open for the element to exist in DOM)
+    // Step index 2 = #meioo-flyout-section (flyout must be open for the element to exist in DOM)
     const FLYOUT_STEP = 2;
 
     tour.onbeforechange((_target: Element, stepIndex: number): Promise<boolean> => {
       if (stepIndex === FLYOUT_STEP) {
-        openFinanceiroFlyout();
-        // Wait for React to render the flyout into the DOM
-        return new Promise((r) => setTimeout(() => r(true), 400));
+        // Garante que o flyout não esteja já aberto antes de clicar
+        closeFinanceiroFlyout();
+        return new Promise((r) =>
+          setTimeout(() => {
+            openFinanceiroFlyout();
+            // Aguarda o React renderizar o flyout no DOM (maior margem para Vercel)
+            setTimeout(() => r(true), 700);
+          }, 100)
+        );
       }
+      // Outros passos: fecha o flyout se estiver aberto
       closeFinanceiroFlyout();
       return Promise.resolve(true);
     });
