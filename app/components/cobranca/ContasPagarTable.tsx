@@ -3,7 +3,7 @@
 import { MeiooIcon } from "../MeiooIcon";
 import { Eye, MoreHorizontal, QrCode, FileText, ArrowRightLeft } from "lucide-react";
 
-interface ContaPagar {
+export interface ContaPagar {
   id: string;
   fornecedor: string;
   historico: string;
@@ -107,7 +107,7 @@ const meioLabel = {
 };
 
 interface ContasPagarTableProps {
-  onPagar?: (id: string) => void;
+  onPagar?: (conta: ContaPagar) => void;
 }
 
 export function ContasPagarTable({ onPagar }: ContasPagarTableProps) {
@@ -191,7 +191,7 @@ export function ContasPagarTable({ onPagar }: ContasPagarTableProps) {
                     <div className="flex items-center justify-end gap-1">
                       {podeAtuar && (
                         <button
-                          onClick={() => onPagar?.(row.id)}
+                          onClick={() => onPagar?.(row)}
                           className="h-6 px-2 rounded text-[10px] font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                         >
                           Pagar

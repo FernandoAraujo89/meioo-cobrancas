@@ -48,6 +48,7 @@ interface PainelMeiooProps {
   onFechar: () => void;
   onAbrirCobranca: (tipo: "pix" | "boleto" | "link" | "cartao" | "pagar" | "menu") => void;
   refreshKey?: number;
+  saldoInicial?: number; // saldo imediato pós-pagamento, evita flash "Carregando..."
 }
 
 interface Transacao {
@@ -64,7 +65,7 @@ const acoes = [
 const MIN_WIDTH = 280;
 const MAX_WIDTH = 640;
 
-export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0 }: PainelMeiooProps) {
+export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0, saldoInicial }: PainelMeiooProps) {
   const [saldoVisivel, setSaldoVisivel] = useState(true);
   const [saldo, setSaldo] = useState<number | null>(null);
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
@@ -78,6 +79,13 @@ export function PainelMeioo({ aberto, onFechar, onAbrirCobranca, refreshKey = 0 
   useEffect(() => {
     setIsDesktop(window.matchMedia("(pointer: fine)").matches);
   }, []);
+
+  // Aplica saldoInicial imediatamente ao abrir (evita flash "Carregando...")
+  useEffect(() => {
+    if (aberto && saldoInicial !== undefined) {
+      setSaldo(saldoInicial);
+    }
+  }, [aberto, saldoInicial]);
 
   // Fetch saldo + transacoes da API sempre que abrir ou refreshKey mudar
   useEffect(() => {

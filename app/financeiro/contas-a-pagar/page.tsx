@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AvanteHeader } from "@/app/components/AvanteHeader";
 import { AvanteSidebar } from "@/app/components/AvanteSidebar";
-import { ContasPagarTable } from "@/app/components/cobranca/ContasPagarTable";
+import { ContasPagarTable, ContaPagar } from "@/app/components/cobranca/ContasPagarTable";
 import { PainelMeioo } from "@/app/components/PainelMeioo";
 import { MeiooIcon } from "@/app/components/MeiooIcon";
 import {
@@ -17,53 +17,79 @@ import {
 } from "lucide-react";
 
 const tabs = [
-  { label: "Em aberto",  count: 4, active: false },
-  { label: "A vencer",   count: 2, active: false },
-  { label: "Atrasado",   count: 1, active: false },
-  { label: "Pago",       count: 2, active: false },
-  { label: "Cancelado",  count: 0, active: false },
-  { label: "Todos",      count: 7, active: true  },
+  { label: "Em aberto",  count: 4 },
+  { label: "A vencer",   count: 2 },
+  { label: "Atrasado",   count: 1 },
+  { label: "Pago",       count: 2 },
+  { label: "Cancelado",  count: 0 },
+  { label: "Todos",      count: 7 },
 ];
 
-// Conta atrasada fixa para o botão "Pagar agora" do alerta
-const CONTA_ATRASADA = { id: 1, fornecedor: "Fornecedora ABC Ltda.", vencimento: "20/08/2025", valor: 3200.00, saldo: 12650.00 };
+// Conta atrasada fixa para o alerta de vencidos
+const CONTA_ATRASADA_BASE = { id: 1, fornecedor: "Fornecedora ABC Ltda.", vencimento: "20/08/2025", valor: 3200.00 };
+
+type ContaModal = { id: number; fornecedor: string; vencimento: string; valor: number; saldoDisponivel: number };
 
 export default function ContasAPagarPage() {
   const [activeTab, setActiveTab] = useState("Todos");
   const [painelMeiooAberto, setPainelMeiooAberto] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [saldoMeioo, setSaldoMeioo] = useState<number | null>(null);
+  const [novoSaldo, setNovoSaldo] = useState<number | undefined>(undefined);
+
   const [showPagarModal, setShowPagarModal] = useState(false);
-  const [contaModal, setContaModal] = useState(CONTA_ATRASADA);
+  const [contaModal, setContaModal] = useState<ContaModal | null>(null);
   const [confirmando, setConfirmando] = useState(false);
   const [pagoOk, setPagoOk] = useState(false);
 
-  function handlePagarAgora() {
-    setContaModal(CONTA_ATRASADA);
+  // Busca saldo Meioo ao montar para exibir no modal
+  useEffect(() => {
+    fetch("/api/saldo")
+      .then(r => r.json())
+      .then(d => setSaldoMeioo(d.saldo));
+  }, []);
+
+  function abrirModal(conta: ContaModal) {
+    setContaModal(conta);
     setShowPagarModal(true);
     setPagoOk(false);
+    setNovoSaldo(undefined);
   }
 
-  function handlePagar(id: string) {
-    setContaModal({ ...CONTA_ATRASADA, id: Number(id) });
-    setShowPagarModal(true);
-    setPagoOk(false);
+  function handlePagarAgora() {
+    abrirModal({ ...CONTA_ATRASADA_BASE, saldoDisponivel: saldoMeioo ?? 0 });
+  }
+
+  function handlePagar(conta: ContaPagar) {
+    abrirModal({
+      id: Number(conta.id),
+      fornecedor: conta.fornecedor,
+      vencimento: conta.vencimento,
+      valor: conta.valor,
+      saldoDisponivel: saldoMeioo ?? 0,
+    });
   }
 
   async function confirmarPagamento() {
+    if (!contaModal) return;
     setConfirmando(true);
     const res = await fetch("/api/pagamentos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ contaId: contaModal.id }),
     });
+    const data = await res.json();
     setConfirmando(false);
+
     if (res.ok) {
+      setNovoSaldo(data.novoSaldo);      // saldo pós-pagamento imediato
+      setSaldoMeioo(data.novoSaldo);     // atualiza saldo local para próximos modais
       setPagoOk(true);
       setTimeout(() => {
         setShowPagarModal(false);
         setPagoOk(false);
-        setRefreshKey(k => k + 1);
-        setPainelMeiooAberto(true);
+        setRefreshKey(k => k + 1);       // força re-fetch no painel
+        setPainelMeiooAberto(true);      // abre painel com saldo atualizado
       }, 1800);
     }
   }
@@ -165,29 +191,11 @@ export default function ContasAPagarPage() {
             {/* Summary cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               {[
-                {
-                  label: "Total a Pagar",
-                  valor: "R$ 12.080,50",
-                  sub: "7 contas",
-                  color: "text-dark",
-                },
-                {
-                  label: "Atrasado",
-                  valor: "R$ 3.200,00",
-                  sub: "1 conta",
-                  color: "text-danger",
-                },
-                {
-                  label: "Pago este mês",
-                  valor: "R$ 1.230,50",
-                  sub: "2 contas",
-                  color: "text-success",
-                },
+                { label: "Total a Pagar",  valor: "R$ 12.080,50", sub: "7 contas",  color: "text-dark"    },
+                { label: "Atrasado",       valor: "R$ 3.200,00",  sub: "1 conta",   color: "text-danger"  },
+                { label: "Pago este mês",  valor: "R$ 1.230,50",  sub: "2 contas",  color: "text-success" },
               ].map((card) => (
-                <div
-                  key={card.label}
-                  className="bg-surface rounded-lg border border-border p-4 shadow-card"
-                >
+                <div key={card.label} className="bg-surface rounded-lg border border-border p-4 shadow-card">
                   <p className="text-[11px] text-muted font-medium mb-1">{card.label}</p>
                   <p className={`text-lg font-bold ${card.color}`}>{card.valor}</p>
                   <p className="text-[11px] text-muted mt-0.5">{card.sub}</p>
@@ -231,21 +239,35 @@ export default function ContasAPagarPage() {
         </main>
       </div>
 
-      {/* Modal confirmação de pagamento */}
-      {showPagarModal && (
+      {/* ── Modal confirmação de pagamento ── */}
+      {showPagarModal && contaModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => !confirmando && setShowPagarModal(false)} />
+          <div className="absolute inset-0 bg-black/40" onClick={() => !confirmando && !pagoOk && setShowPagarModal(false)} />
           <div className="relative bg-surface rounded-xl shadow-xl border border-border w-full max-w-[400px] p-6 z-10">
 
             {pagoOk ? (
               /* ── Sucesso ── */
               <div className="flex flex-col items-center py-4 gap-3">
                 <div className="w-14 h-14 rounded-full bg-success-bg flex items-center justify-center">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-success"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-success">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
                 </div>
                 <h2 className="text-sm font-bold text-dark">Pagamento realizado!</h2>
                 <p className="text-xs text-muted text-center">
-                  R$ {contaModal.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} debitado da sua Conta Digital Meioo.<br/>Abrindo o painel…
+                  <strong className="text-dark">
+                    R$ {contaModal.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </strong>{" "}
+                  debitado da sua Conta Digital Meioo.
+                  <br />
+                  {novoSaldo !== undefined && (
+                    <span className="text-success font-medium">
+                      Novo saldo: R$ {novoSaldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </span>
+                  )}
+                  <br />
+                  <span className="text-muted">Abrindo o painel…</span>
                 </p>
               </div>
             ) : (
@@ -276,10 +298,12 @@ export default function ContasAPagarPage() {
                       R$ {contaModal.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                  <div className="flex justify-between gap-2">
+                  <div className="flex justify-between gap-2 pt-1 border-t border-border">
                     <span className="text-muted shrink-0">Saldo disponível</span>
-                    <span className="font-medium text-success">
-                      R$ {contaModal.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    <span className={`font-medium ${contaModal.saldoDisponivel >= contaModal.valor ? "text-success" : "text-danger"}`}>
+                      {saldoMeioo !== null
+                        ? `R$ ${contaModal.saldoDisponivel.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                        : "Carregando..."}
                     </span>
                   </div>
                 </div>
@@ -298,7 +322,7 @@ export default function ContasAPagarPage() {
                   </button>
                   <button
                     onClick={confirmarPagamento}
-                    disabled={confirmando}
+                    disabled={confirmando || contaModal.saldoDisponivel < contaModal.valor}
                     className="flex-1 h-9 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors disabled:opacity-70"
                   >
                     {confirmando ? "Processando…" : "Confirmar pagamento"}
@@ -315,6 +339,7 @@ export default function ContasAPagarPage() {
         onFechar={() => setPainelMeiooAberto(false)}
         onAbrirCobranca={() => setPainelMeiooAberto(false)}
         refreshKey={refreshKey}
+        saldoInicial={novoSaldo}
       />
     </div>
   );
