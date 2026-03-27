@@ -38,11 +38,12 @@ interface NavItem {
   icon: React.ElementType;
   label: string;
   active?: boolean;
+  href?: string;
   children?: NavChild[];
 }
 
 const navItems: NavItem[] = [
-  { icon: Home, label: "Página Inicial" },
+  { icon: Home, label: "Página Inicial", href: "/" },
   {
     icon: Edit,
     label: "Cadastros",
@@ -206,7 +207,10 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
   const [flyoutItem, setFlyoutItem] = useState<NavItem | null>(null);
 
   function handleIconClick(item: NavItem) {
-    if (item.children) {
+    if (item.href) {
+      setFlyoutItem(null);
+      router.push(item.href);
+    } else if (item.children) {
       setFlyoutItem(flyoutItem?.label === item.label ? null : item);
     } else {
       setFlyoutItem(null);
