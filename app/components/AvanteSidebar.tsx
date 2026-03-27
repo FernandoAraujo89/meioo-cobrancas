@@ -237,8 +237,11 @@ export function AvanteSidebar({ onAbrirMeioo }: AvanteSidebarProps) {
           })}
         </nav>
 
-        {/* Meioo footer */}
-        <div className="shrink-0 border-t border-border">
+        {/* Meioo footer — padding compensa a safe-area do iOS (home indicator) */}
+        <div
+          className="shrink-0 border-t border-border"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        >
           <button
             id="meioo-sidebar-btn"
             onClick={() => { setFlyoutItem(null); onAbrirMeioo?.(); }}

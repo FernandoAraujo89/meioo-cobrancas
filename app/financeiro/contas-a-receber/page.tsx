@@ -42,14 +42,14 @@ export default function ContasAReceberPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-[100dvh] overflow-hidden">
       <AvanteHeader />
 
       <div className="flex flex-1 overflow-hidden">
         <AvanteSidebar onAbrirMeioo={() => setPainelMeiooAberto(true)} />
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto safe-scroll">
           <div className="p-3 sm:p-6">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-[11px] text-muted mb-4">
